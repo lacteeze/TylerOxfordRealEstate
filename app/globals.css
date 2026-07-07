@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  --bg: #15171c;
+  --bg-rgb: 21, 23, 28;
+  --bg2: rgb(16, 18, 22);
+  --bg3: #0f1114;
+  --bg-hov: #191c22;
+  --bg2-hov: #14161b;
+  --field: #181b21;
+  --surface: #1b1e24;
+  --ink: #f1eee8;
+  --ink-rgb: 241, 238, 232;
+  --gold: #c9a15a;
+  --gold-hov: #d9b475;
+  --gold-ink: #15171c;
+
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-archivo), Archivo, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.35s ease, color 0.35s ease;
+}
+
+body[data-theme="light"] {
+  --bg: #f6f3ec;
+  --bg-rgb: 246, 243, 236;
+  --bg2: #efebe1;
+  --bg3: #e9e4d8;
+  --bg-hov: #f1ede4;
+  --bg2-hov: #eae5da;
+  --field: #ffffff;
+  --surface: #ded8ca;
+  --ink: #211e18;
+  --ink-rgb: 33, 30, 24;
+  --gold: #a8823e;
+  --gold-hov: #8f6d30;
+  --gold-ink: #faf7f0;
+}
+
+::selection {
+  background: var(--gold);
+  color: var(--bg);
+}
+
+.font-serif-display {
+  font-family: var(--font-instrument), "Instrument Serif", serif;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.fade-up {
+  animation: fadeUp 0.9s ease both;
+}
+
+input,
+textarea,
+select,
+button {
+  font-family: var(--font-archivo), Archivo, sans-serif;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 1px solid var(--gold);
+  outline-offset: 0;
+}
