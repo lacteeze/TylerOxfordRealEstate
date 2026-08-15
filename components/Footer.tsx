@@ -2,11 +2,10 @@ import Link from "next/link";
 import Image from "next/image";
 import ContactForm from "./ContactForm";
 
-// NOTE: the Facebook URL is a placeholder — confirm the real handle.
 const socials: { label: string; href: string; icon: string }[] = [
   { label: "Instagram", href: "https://instagram.com/tylerjoxford", icon: "/icons/instagram.png" },
   { label: "TikTok", href: "https://tiktok.com/@tylerjoxford", icon: "/icons/tiktok.png" },
-  { label: "Facebook", href: "https://facebook.com/tylerjoxford", icon: "/icons/facebook.png" },
+  { label: "Facebook", href: "https://www.facebook.com/tyleroxfordrealestate/", icon: "/icons/facebook.png" },
   { label: "YouTube", href: "https://www.youtube.com/@TylerOxford", icon: "/icons/youtube.png" },
   { label: "Google Business profile", href: "https://share.google/6dLQR1D6fWXatCFIw", icon: "/icons/google.png" },
 ];
