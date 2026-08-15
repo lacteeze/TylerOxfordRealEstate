@@ -30,11 +30,11 @@ export function priceLabel(l: Pick<Listing, "price" | "status">): string {
 export function chip(status: ListingStatus): { label: string; color: string } {
   switch (status) {
     case "sale":
-      return { label: "FOR SALE", color: "#c9a15a" };
+      return { label: "FOR SALE", color: "#aac6ef" };
     case "lease":
-      return { label: "FOR LEASE", color: "#9db4c0" };
+      return { label: "FOR LEASE", color: "#e8d9b0" };
     case "sold":
-      return { label: "SOLD", color: "rgba(241,238,232,.55)" };
+      return { label: "SOLD", color: "rgba(255,255,255,.75)" };
   }
 }
 

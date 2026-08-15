@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { notifyLeadBySms } from "@/lib/pingram";
 
 export interface LeadInput {
   kind: "real_estate" | "media";
@@ -30,5 +31,13 @@ export async function submitLead(
   });
 
   if (error) return { ok: false, error: "Something went wrong — please try again." };
+
+  // SMS failures shouldn't break the form — the lead is already saved in Supabase.
+  try {
+    await notifyLeadBySms({ ...input, name });
+  } catch (e) {
+    console.error("Lead saved but SMS notification failed:", e);
+  }
+
   return { ok: true };
 }

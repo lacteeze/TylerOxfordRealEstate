@@ -1,45 +1,38 @@
 import type { Metadata } from "next";
-import { Archivo, Instrument_Serif } from "next/font/google";
+import { Poppins, Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-const archivo = Archivo({
+const poppins = Poppins({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
-  variable: "--font-archivo",
+  variable: "--font-body",
 });
 
-const instrument = Instrument_Serif({
+const hanken = Hanken_Grotesk({
   subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
-  variable: "--font-instrument",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-heading",
 });
 
 export const metadata: Metadata = {
-  title: "Tyler Oxford — REALTOR® & Oxford Media · St. John's NL",
+  title: "Tyler Oxford — REALTOR® & Move Media · St. John's NL",
   description:
-    "St. John's real estate, shot and sold by an award winner. Tyler Oxford — REALTOR® (EXP Realty) and founder of Oxford Media, an in-house award-winning real estate media studio.",
+    "St. John's real estate, shot and sold by an award winner. Tyler Oxford — REALTOR® (EXP Realty) and founder of Move Media, an in-house award-winning real estate media studio.",
 };
-
-const themeInit = `
-try {
-  var t = localStorage.getItem('to-theme') || 'dark';
-  document.body.dataset.theme = t;
-} catch (e) {}
-`;
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${archivo.variable} ${instrument.variable}`}>
-        <script dangerouslySetInnerHTML={{ __html: themeInit }} />
-        <Header />
-        {children}
-        <Footer />
+      <body className={`${poppins.variable} ${hanken.variable}`}>
+        <div className="page-shell">
+          <Header />
+          {children}
+          <Footer />
+        </div>
       </body>
     </html>
   );

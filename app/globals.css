@@ -5,51 +5,57 @@ html {
 }
 
 body {
-  --bg: #15171c;
-  --bg-rgb: 21, 23, 28;
-  --bg2: rgb(16, 18, 22);
-  --bg3: #0f1114;
-  --bg-hov: #191c22;
-  --bg2-hov: #14161b;
-  --field: #181b21;
-  --surface: #1b1e24;
-  --ink: #f1eee8;
-  --ink-rgb: 241, 238, 232;
-  --gold: #c9a15a;
-  --gold-hov: #d9b475;
-  --gold-ink: #15171c;
+  /* Harbor-style light palette */
+  --cream: #f6efe5;
+  --peach: #f9ece0;
+  --navy: #1d2e49;
+  --navy-hov: #16233a;
+  --navy-ink: #ffffff;
+  --card: #f4f4f1;
+  --line: rgba(22, 24, 29, 0.1);
+
+  /* Legacy variable names kept for shared components (gallery, admin) */
+  --bg: #ffffff;
+  --bg-rgb: 255, 255, 255;
+  --bg2: #f4f4f1;
+  --bg3: #f6efe5;
+  --bg-hov: #fafaf7;
+  --bg2-hov: #eeeeea;
+  --field: #ffffff;
+  --surface: #e9e9e4;
+  --ink: #16181d;
+  --ink-rgb: 22, 24, 29;
+  --gold: #1d2e49;
+  --gold-hov: #16233a;
+  --gold-ink: #ffffff;
 
   margin: 0;
-  background: var(--bg);
+  background: var(--cream);
   color: var(--ink);
-  font-family: var(--font-archivo), Archivo, sans-serif;
+  font-family: var(--font-body), Poppins, sans-serif;
   -webkit-font-smoothing: antialiased;
-  transition: background 0.35s ease, color 0.35s ease;
-}
-
-body[data-theme="light"] {
-  --bg: #f6f3ec;
-  --bg-rgb: 246, 243, 236;
-  --bg2: #efebe1;
-  --bg3: #e9e4d8;
-  --bg-hov: #f1ede4;
-  --bg2-hov: #eae5da;
-  --field: #ffffff;
-  --surface: #ded8ca;
-  --ink: #211e18;
-  --ink-rgb: 33, 30, 24;
-  --gold: #a8823e;
-  --gold-hov: #8f6d30;
-  --gold-ink: #faf7f0;
 }
 
 ::selection {
-  background: var(--gold);
-  color: var(--bg);
+  background: var(--navy);
+  color: var(--navy-ink);
 }
 
+/* Heading typeface */
+.font-display,
 .font-serif-display {
-  font-family: var(--font-instrument), "Instrument Serif", serif;
+  font-family: var(--font-heading), "Hanken Grotesk", sans-serif;
+  font-style: normal;
+}
+
+/* Rounded white page shell sitting on the cream backdrop */
+.page-shell {
+  max-width: 1560px;
+  margin: clamp(10px, 1.6vw, 26px) auto;
+  background: var(--bg);
+  border-radius: clamp(14px, 1.8vw, 26px);
+  overflow: clip;
+  width: calc(100% - clamp(16px, 3vw, 56px));
 }
 
 @keyframes fadeUp {
@@ -67,16 +73,108 @@ body[data-theme="light"] {
   animation: fadeUp 0.9s ease both;
 }
 
+/* Slow ken-burns style reveal for the hero photo */
+@keyframes heroReveal {
+  from {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.hero-media {
+  animation: heroReveal 1.6s cubic-bezier(0.22, 0.61, 0.36, 1) 0.15s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-up,
+  .hero-media {
+    animation: none;
+  }
+}
+
+/* Navy pill button */
+.pill-navy {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--navy);
+  color: var(--navy-ink);
+  border: 1px solid var(--navy);
+  border-radius: 999px;
+  padding: 11px 20px;
+  font-size: 13.5px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+
+.pill-navy:hover {
+  background: var(--navy-hov);
+}
+
+.pill-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 11px 20px;
+  font-size: 13.5px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.25s ease;
+}
+
+.pill-outline:hover {
+  border-color: rgba(22, 24, 29, 0.4);
+}
+
+/* Small circular arrow inside pills */
+.pill-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--navy);
+  font-size: 11px;
+  line-height: 1;
+}
+
+.pill-outline .pill-arrow {
+  background: var(--card);
+}
+
+/* Accordion / FAQ resets */
+details.clean > summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+details.clean > summary::-webkit-details-marker {
+  display: none;
+}
+
 input,
 textarea,
 select,
 button {
-  font-family: var(--font-archivo), Archivo, sans-serif;
+  font-family: var(--font-body), Poppins, sans-serif;
 }
 
 input:focus,
 textarea:focus,
 select:focus {
-  outline: 1px solid var(--gold);
+  outline: 2px solid var(--navy);
   outline-offset: 0;
 }

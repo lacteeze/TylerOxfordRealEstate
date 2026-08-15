@@ -14,15 +14,11 @@ export default function ListingCard({ listing }: { listing: Listing }) {
   return (
     <Link
       href={`/p/${listing.id}`}
-      className="group flex flex-col overflow-hidden rounded-[14px] border no-underline transition-colors"
-      style={{
-        color: "var(--ink)",
-        background: "var(--bg2)",
-        borderColor: "rgba(var(--ink-rgb),.14)",
-      }}
+      className="group flex flex-col no-underline"
+      style={{ color: "var(--ink)" }}
     >
       <span
-        className="relative block overflow-hidden"
+        className="relative block overflow-hidden rounded-[18px]"
         style={{ aspectRatio: "4/3", background: "var(--surface)" }}
       >
         {cover && (
@@ -30,20 +26,19 @@ export default function ListingCard({ listing }: { listing: Listing }) {
             src={cover}
             alt={listing.title}
             fill
-            sizes="(max-width: 768px) 100vw, 33vw"
+            sizes="(max-width: 640px) 100vw, 50vw"
             className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           />
         )}
         <span
-          className="absolute left-3.5 top-3.5 border font-semibold"
+          className="absolute left-3.5 top-3.5 rounded-full font-semibold"
           style={{
             fontSize: 10,
-            letterSpacing: ".18em",
-            padding: "6px 10px",
-            background: "rgba(16,18,22,.78)",
+            letterSpacing: ".14em",
+            padding: "7px 12px",
+            background: "rgba(15,17,20,.72)",
             backdropFilter: "blur(6px)",
             color: c.color,
-            borderColor: c.color,
           }}
         >
           {c.label}
@@ -57,18 +52,16 @@ export default function ListingCard({ listing }: { listing: Listing }) {
               setIdx((i) => (i + 1) % photos.length);
             }}
             className="absolute bottom-0 right-0 top-0 flex w-[32%] cursor-pointer items-center justify-end border-none pr-3.5 opacity-0 transition-opacity hover:opacity-100"
-            style={{ background: "linear-gradient(to left,rgba(16,18,22,.35),rgba(16,18,22,0))" }}
+            style={{ background: "linear-gradient(to left,rgba(15,17,20,.35),rgba(15,17,20,0))" }}
           >
             <span
               className="flex items-center justify-center rounded-full"
               style={{
-                width: 42,
-                height: 42,
-                background: "rgba(16,18,22,.35)",
-                border: "1px solid rgba(241,238,232,.6)",
-                backdropFilter: "blur(5px)",
-                color: "#f1eee8",
-                fontSize: 17,
+                width: 40,
+                height: 40,
+                background: "rgba(255,255,255,.85)",
+                color: "var(--ink)",
+                fontSize: 16,
                 lineHeight: 1,
               }}
             >
@@ -77,18 +70,20 @@ export default function ListingCard({ listing }: { listing: Listing }) {
           </button>
         )}
       </span>
-      <span
-        className="flex min-w-0 flex-col gap-[7px]"
-        style={{ padding: "clamp(18px,2.5vw,24px) clamp(18px,2.5vw,24px) clamp(22px,3vw,28px)" }}
-      >
-        <span style={{ fontSize: 15, fontWeight: 600, color: "var(--gold)", letterSpacing: ".02em" }}>
+      <span className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1" style={{ padding: "16px 4px 0" }}>
+        <span className="font-display" style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-.01em" }}>
           {priceLabel(listing)}
         </span>
-        <span className="font-serif-display" style={{ fontSize: "clamp(22px,2vw,26px)", lineHeight: 1.2 }}>
+        <span style={{ fontSize: 12.5, fontWeight: 500, color: "rgba(var(--ink-rgb),.65)" }}>
+          {specs(listing)}
+        </span>
+      </span>
+      <span className="flex flex-col gap-0.5" style={{ padding: "6px 4px 0" }}>
+        <span className="font-display" style={{ fontSize: 15.5, fontWeight: 600, lineHeight: 1.3 }}>
           {listing.title}
         </span>
-        <span style={{ fontSize: 12.5, lineHeight: 1.55, color: "rgba(var(--ink-rgb),.55)", letterSpacing: ".04em" }}>
-          {listing.neighbourhood} · {specs(listing)}
+        <span style={{ fontSize: 12.5, color: "rgba(var(--ink-rgb),.55)" }}>
+          ◉ {listing.neighbourhood}
         </span>
       </span>
     </Link>

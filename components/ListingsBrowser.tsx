@@ -7,17 +7,27 @@ import ListingCard from "./ListingCard";
 type FilterKey = "all" | ListingStatus;
 
 const pillBase: React.CSSProperties = {
-  fontSize: 11.5,
-  fontWeight: 600,
-  letterSpacing: ".14em",
+  fontSize: 12.5,
+  fontWeight: 500,
   padding: "10px 18px",
   borderRadius: 999,
+  border: "none",
 };
 
-export default function ListingsBrowser({ listings }: { listings: Listing[] }) {
-  const [filter, setFilter] = useState<FilterKey>("all");
-  const [query, setQuery] = useState("");
-  const [minBeds, setMinBeds] = useState(0);
+export default function ListingsBrowser({
+  listings,
+  initialQuery = "",
+  initialFilter = "all",
+  initialMinBeds = 0,
+}: {
+  listings: Listing[];
+  initialQuery?: string;
+  initialFilter?: FilterKey;
+  initialMinBeds?: number;
+}) {
+  const [filter, setFilter] = useState<FilterKey>(initialFilter);
+  const [query, setQuery] = useState(initialQuery);
+  const [minBeds, setMinBeds] = useState(initialMinBeds);
   const [sort, setSort] = useState("featured");
 
   const counts = useMemo(() => {
@@ -47,14 +57,13 @@ export default function ListingsBrowser({ listings }: { listings: Listing[] }) {
   const filtersActive = !!(query.trim() || minBeds || sort !== "featured" || filter !== "all");
 
   const selectStyle: React.CSSProperties = {
-    background: "var(--field)",
-    border: "1px solid rgba(var(--ink-rgb),.18)",
+    background: "var(--card)",
+    border: "1px solid transparent",
     color: "var(--ink)",
     borderRadius: 999,
-    padding: "12px 16px",
-    fontSize: 12,
+    padding: "12px 18px",
+    fontSize: 12.5,
     fontWeight: 500,
-    letterSpacing: ".06em",
     cursor: "pointer",
   };
 
@@ -74,37 +83,37 @@ export default function ListingsBrowser({ listings }: { listings: Listing[] }) {
             placeholder="Search by address, neighbourhood, or keyword…"
             className="w-full box-border"
             style={{
-              background: "var(--field)",
-              border: "1px solid rgba(var(--ink-rgb),.18)",
+              background: "var(--bg)",
+              border: "1px solid var(--line)",
               color: "var(--ink)",
               borderRadius: 999,
               padding: "13px 20px 13px 44px",
-              fontSize: 14,
+              fontSize: 13.5,
             }}
           />
         </div>
         <select value={String(minBeds)} onChange={(e) => setMinBeds(Number(e.target.value))} style={selectStyle}>
-          <option value="0">ANY BEDS</option>
-          <option value="2">2+ BEDS</option>
-          <option value="3">3+ BEDS</option>
-          <option value="4">4+ BEDS</option>
-          <option value="5">5+ BEDS</option>
+          <option value="0">Any beds</option>
+          <option value="2">2+ beds</option>
+          <option value="3">3+ beds</option>
+          <option value="4">4+ beds</option>
+          <option value="5">5+ beds</option>
         </select>
         <select value={sort} onChange={(e) => setSort(e.target.value)} style={selectStyle}>
-          <option value="featured">FEATURED FIRST</option>
-          <option value="price-asc">PRICE — LOW TO HIGH</option>
-          <option value="price-desc">PRICE — HIGH TO LOW</option>
-          <option value="sqft">LARGEST FIRST</option>
+          <option value="featured">Featured first</option>
+          <option value="price-asc">Price — low to high</option>
+          <option value="price-desc">Price — high to low</option>
+          <option value="sqft">Largest first</option>
         </select>
       </div>
 
       <div className="mb-10 flex flex-wrap items-center gap-2.5">
         {(
           [
-            ["all", `ALL (${counts.all})`],
-            ["sale", `FOR SALE (${counts.sale})`],
-            ["lease", `FOR LEASE (${counts.lease})`],
-            ["sold", `SOLD (${counts.sold})`],
+            ["all", `All (${counts.all})`],
+            ["sale", `For sale (${counts.sale})`],
+            ["lease", `For lease (${counts.lease})`],
+            ["sold", `Sold (${counts.sold})`],
           ] as [FilterKey, string][]
         ).map(([key, label]) => {
           const on = key === filter;
@@ -112,12 +121,11 @@ export default function ListingsBrowser({ listings }: { listings: Listing[] }) {
             <button
               key={key}
               onClick={() => setFilter(key)}
-              className="cursor-pointer border transition-colors hover:!border-[var(--gold)]"
+              className="cursor-pointer transition-colors"
               style={{
                 ...pillBase,
-                background: on ? "var(--gold)" : "transparent",
-                color: on ? "var(--gold-ink)" : "rgba(var(--ink-rgb),.7)",
-                borderColor: on ? "var(--gold)" : "rgba(var(--ink-rgb),.22)",
+                background: on ? "var(--ink)" : "var(--card)",
+                color: on ? "#fff" : "var(--ink)",
               }}
             >
               {label}
@@ -132,31 +140,25 @@ export default function ListingsBrowser({ listings }: { listings: Listing[] }) {
               setSort("featured");
               setFilter("all");
             }}
-            className="cursor-pointer border border-transparent transition-colors hover:!border-[var(--gold)]"
-            style={{ ...pillBase, padding: "10px 16px", background: "none", color: "var(--gold)" }}
+            className="cursor-pointer transition-colors"
+            style={{ ...pillBase, padding: "10px 16px", background: "none", color: "var(--gold)", fontWeight: 600 }}
           >
-            CLEAR ✕
+            Clear ✕
           </button>
         )}
-        <span className="ml-auto" style={{ fontSize: 12, letterSpacing: ".1em", color: "rgba(var(--ink-rgb),.5)" }}>
-          {filtered.length} {filtered.length === 1 ? "PROPERTY" : "PROPERTIES"}
+        <span className="ml-auto" style={{ fontSize: 12, color: "rgba(var(--ink-rgb),.5)" }}>
+          {filtered.length} {filtered.length === 1 ? "property" : "properties"}
         </span>
       </div>
 
-      <div
-        className="grid"
-        style={{
-          gridTemplateColumns: "repeat(auto-fill,minmax(min(100%,300px),1fr))",
-          gap: "clamp(20px,3vw,32px)",
-        }}
-      >
+      <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.map((l) => (
           <ListingCard key={l.id} listing={l} />
         ))}
       </div>
 
       {filtered.length === 0 && (
-        <p className="font-serif-display my-[60px] text-center" style={{ fontSize: 26, color: "rgba(var(--ink-rgb),.5)" }}>
+        <p className="font-display my-[60px] text-center" style={{ fontSize: 22, fontWeight: 500, color: "rgba(var(--ink-rgb),.5)" }}>
           No matches — try clearing the search or filters.
         </p>
       )}
