@@ -22,6 +22,7 @@ export async function notifyLeadBySms(lead: LeadInput): Promise<void> {
   const lines = [
     `New ${kindLabel} inquiry — tyleroxford.com`,
     `From: ${lead.name}${contact ? ` (${contact})` : ""}`,
+    lead.services?.length ? `Requested: ${lead.services.join(", ")}` : null,
     lead.listing_id ? `Listing: ${lead.listing_id}` : null,
     lead.message ? `"${lead.message.slice(0, 280)}"` : null,
   ].filter(Boolean);

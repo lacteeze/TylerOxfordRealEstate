@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { submitLead } from "@/app/actions";
+import { MEDIA_SERVICES, type MediaService } from "@/lib/types";
 
 const labelStyle: React.CSSProperties = {
   fontSize: 11.5,
@@ -20,6 +21,7 @@ const fieldStyle: React.CSSProperties = {
 
 export default function ContactForm() {
   const [kind, setKind] = useState<"real_estate" | "media">("real_estate");
+  const [services, setServices] = useState<MediaService[]>([]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -32,7 +34,7 @@ export default function ContactForm() {
     e.preventDefault();
     setError("");
     startTransition(async () => {
-      const res = await submitLead({ kind, name, email, phone, message });
+      const res = await submitLead({ kind, name, email, phone, message, services });
       if (res.ok) setSent(true);
       else setError(res.error || "Something went wrong.");
     });
@@ -77,6 +79,38 @@ export default function ContactForm() {
           </button>
         ))}
       </div>
+      {kind === "media" && (
+        <div className="flex flex-col gap-1.5">
+          <span style={labelStyle}>What would you like?</span>
+          <div className="flex flex-wrap gap-2">
+            {MEDIA_SERVICES.map((s) => {
+              const active = services.includes(s);
+              return (
+                <button
+                  key={s}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() =>
+                    setServices((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]))
+                  }
+                  className="cursor-pointer rounded-full transition-colors"
+                  style={{
+                    fontSize: 12.5,
+                    fontWeight: 500,
+                    padding: "9px 16px",
+                    border: active ? "1px solid var(--navy)" : "1px solid var(--line)",
+                    background: active ? "var(--navy)" : "var(--card)",
+                    color: active ? "#fff" : "var(--ink)",
+                  }}
+                >
+                  {active ? "✓ " : ""}
+                  {s}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
       <label className="flex flex-col gap-1.5">
         <span style={labelStyle}>Name *</span>
         <input value={name} onChange={(e) => setName(e.target.value)} style={fieldStyle} placeholder="Your name" />

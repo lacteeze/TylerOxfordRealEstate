@@ -130,10 +130,13 @@ export default function Footer() {
       >
         <span>© 2026 TYLER OXFORD · REALTOR® · EXP REALTY</span>
         <span>ST. JOHN&apos;S &amp; EASTERN NEWFOUNDLAND</span>
-        <span>
-          Website designed by{" "}
-          <span style={{ fontWeight: 700, letterSpacing: ".22em" }}>CANARY</span>
-        </span>
+      </div>
+      <div
+        className="mx-auto mt-4 max-w-[1400px] text-center"
+        style={{ fontSize: 13, letterSpacing: ".08em", color: "rgba(var(--ink-rgb),.45)" }}
+      >
+        Website designed by{" "}
+        <span style={{ fontWeight: 700, letterSpacing: ".22em" }}>CANARY</span>
       </div>
     </div>
   );

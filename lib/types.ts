@@ -1,5 +1,9 @@
 export type ListingStatus = "sale" | "lease" | "sold";
 
+// Services a client can request in a Move Media booking.
+export const MEDIA_SERVICES = ["Photos", "Drone", "Video", "3D Tour"] as const;
+export type MediaService = (typeof MEDIA_SERVICES)[number];
+
 export interface Listing {
   id: string;
   title: string;
