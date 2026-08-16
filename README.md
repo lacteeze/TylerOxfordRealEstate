@@ -16,9 +16,9 @@ Oxford Media, an award-winning real estate media studio in St. John's, Newfoundl
   lightbox, and map
 - Contact form that writes leads to Supabase (`leads` table) — ready to be wired to the
   Pingram API for a dedicated lead pipeline
-- `/admin` — private listing manager (Supabase email/password auth). Add, edit, remove
-  listings and upload photos to Supabase Storage. `/admin/settings` connects Google Drive
-  for folder imports.
+- `/admin` — private listing manager (Supabase email/password auth). Add, edit, or archive
+  listings, swap the photos used on each home-page section, and upload photos to Supabase
+  Storage. `/admin/settings` connects Google Drive for folder imports.
 
 ## Local development
 
@@ -54,5 +54,7 @@ GOOGLE_CLIENT_SECRET=
 - Project: `tyler-oxford-real-estate` (ca-central-1)
 - Tables: `listings` (public read, authenticated write; optional Drive folder fields),
   `leads` (public insert, authenticated read), `admin_settings` (authenticated only;
-  Google refresh token is encrypted and never sent to the browser)
-- Storage bucket: `listing-photos` (public read, authenticated write)
+  Google refresh token is encrypted and never sent to the browser), `landing_photos`
+  (public read, authenticated write; home-page section photo overrides)
+- Storage bucket: `listing-photos` (public read, authenticated write; listing galleries
+  and uploaded landing-page photos)
