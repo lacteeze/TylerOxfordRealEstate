@@ -411,7 +411,16 @@ export default function AdminManager({ initialListings }: { initialListings: Lis
               return (
                 <div
                   key={l.id}
-                  className="flex flex-wrap items-center"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => startEdit(l)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      startEdit(l);
+                    }
+                  }}
+                  className="flex flex-wrap items-center cursor-pointer transition-colors hover:!bg-[var(--bg2)]"
                   style={{ gap: "12px 20px", background: "var(--bg)", padding: "14px 18px" }}
                 >
                   {l.photos?.[0] ? (
@@ -435,14 +444,22 @@ export default function AdminManager({ initialListings }: { initialListings: Lis
                     </span>
                   </div>
                   <button
-                    onClick={() => startEdit(l)}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      startEdit(l);
+                    }}
                     className="cursor-pointer border bg-transparent transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)]"
                     style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".12em", padding: "9px 16px", color: "var(--ink)", borderColor: "rgba(var(--ink-rgb),.25)" }}
                   >
                     EDIT
                   </button>
                   <button
-                    onClick={() => remove(l.id)}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      remove(l.id);
+                    }}
                     className="cursor-pointer border bg-transparent transition-colors hover:!border-[#c96a5a] hover:!text-[#c96a5a]"
                     style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".12em", padding: "9px 16px", color: "rgba(var(--ink-rgb),.4)", borderColor: "rgba(var(--ink-rgb),.12)" }}
                   >
