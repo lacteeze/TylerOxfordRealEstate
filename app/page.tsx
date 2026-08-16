@@ -62,6 +62,7 @@ export default async function Home() {
     .from("listings")
     .select("*")
     .eq("featured", true)
+    .eq("archived", false)
     .neq("status", "sold")
     .order("price", { ascending: false })
     .limit(6);

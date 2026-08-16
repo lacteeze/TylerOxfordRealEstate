@@ -21,6 +21,7 @@ export interface Listing {
   photos: string[];
   drive_folder_id?: string;
   drive_folder_url?: string;
+  archived?: boolean;
   created_at?: string;
   updated_at?: string;
 }

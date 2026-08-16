@@ -18,6 +18,7 @@ export default async function ListingsPage({
   const { data } = await supabase
     .from("listings")
     .select("*")
+    .eq("archived", false)
     .order("created_at", { ascending: false });
   const listings = (data || []) as Listing[];
 

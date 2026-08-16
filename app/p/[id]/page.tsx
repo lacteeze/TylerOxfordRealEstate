@@ -17,6 +17,7 @@ export default async function PropertyPage({
     .from("listings")
     .select("*")
     .eq("id", decodeURIComponent(id))
+    .eq("archived", false)
     .maybeSingle();
 
   if (!data) notFound();

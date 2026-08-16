@@ -79,6 +79,67 @@ const ghostBtn: React.CSSProperties = {
   borderColor: "rgba(var(--ink-rgb),.2)",
 };
 
+function ListingRow({
+  listing,
+  actionLabel,
+  onOpen,
+  onAction,
+}: {
+  listing: Listing;
+  actionLabel: string;
+  onOpen: () => void;
+  onAction: () => void;
+}) {
+  const c = chip(listing.status);
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={onOpen}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onOpen();
+        }
+      }}
+      className="flex flex-wrap items-center cursor-pointer transition-colors hover:!bg-[var(--bg2)]"
+      style={{ gap: "12px 20px", background: "var(--bg)", padding: "14px 18px" }}
+    >
+      {listing.photos?.[0] ? (
+        <Image
+          src={listing.photos[0]}
+          alt=""
+          width={86}
+          height={60}
+          className="flex-none rounded-md object-cover"
+          style={{ background: "var(--surface)" }}
+        />
+      ) : (
+        <span className="block flex-none rounded-md" style={{ width: 86, height: 60, background: "var(--surface)" }} />
+      )}
+      <div className="flex min-w-0 flex-1 flex-col gap-[3px]">
+        <span className="font-serif-display" style={{ fontSize: 19 }}>
+          {listing.title}
+        </span>
+        <span style={{ fontSize: 11.5, color: "rgba(var(--ink-rgb),.5)", letterSpacing: ".04em" }}>
+          {c.label} · {priceLabel(listing)} · {(listing.photos || []).length} photos
+        </span>
+      </div>
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onAction();
+        }}
+        className="cursor-pointer border bg-transparent transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)]"
+        style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".12em", padding: "9px 16px", color: "rgba(var(--ink-rgb),.4)", borderColor: "rgba(var(--ink-rgb),.12)" }}
+      >
+        {actionLabel}
+      </button>
+    </div>
+  );
+}
+
 export default function AdminManager({ initialListings }: { initialListings: Listing[] }) {
   const router = useRouter();
   const [listings, setListings] = useState<Listing[]>(initialListings);
@@ -288,6 +349,7 @@ export default function AdminManager({ initialListings }: { initialListings: Lis
       photos: form.photos,
       drive_folder_id: drive.drive_folder_id,
       drive_folder_url: drive.drive_folder_url,
+      archived: isNew ? false : Boolean(listings.find((l) => l.id === id)?.archived),
     };
 
     const { error } = await supabase.from("listings").upsert(record);
@@ -304,14 +366,13 @@ export default function AdminManager({ initialListings }: { initialListings: Lis
     router.refresh();
   }
 
-  async function remove(id: string) {
-    if (!confirm("Remove this listing from the site?")) return;
-    const { error } = await supabase.from("listings").delete().eq("id", id);
+  async function setArchived(id: string, archived: boolean) {
+    const { error } = await supabase.from("listings").update({ archived }).eq("id", id);
     if (error) {
-      setError(`Delete failed: ${error.message}`);
+      setError(archived ? `Archive failed: ${error.message}` : `Restore failed: ${error.message}`);
       return;
     }
-    setListings((ls) => ls.filter((l) => l.id !== id));
+    setListings((ls) => ls.map((l) => (l.id === id ? { ...l, archived } : l)));
     router.refresh();
   }
 
@@ -396,8 +457,7 @@ export default function AdminManager({ initialListings }: { initialListings: Lis
         )}
       </div>
       <p style={{ margin: "8px 0 40px", fontSize: 13.5, color: "rgba(var(--ink-rgb),.55)", maxWidth: 560 }}>
-        Add, edit or remove properties. Photos upload to secure cloud storage and appear on
-        the site instantly.
+        Add, edit or archive properties. Archived listings leave the public site and can be restored here.
       </p>
 
       {editing === null && (
@@ -406,58 +466,40 @@ export default function AdminManager({ initialListings }: { initialListings: Lis
             className="flex flex-col overflow-hidden rounded-xl border"
             style={{ gap: 1, background: "rgba(var(--ink-rgb),.09)", borderColor: "rgba(var(--ink-rgb),.09)" }}
           >
-            {listings.map((l) => {
-              const c = chip(l.status);
-              return (
-                <div
-                  key={l.id}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => startEdit(l)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      startEdit(l);
-                    }
-                  }}
-                  className="flex flex-wrap items-center cursor-pointer transition-colors hover:!bg-[var(--bg2)]"
-                  style={{ gap: "12px 20px", background: "var(--bg)", padding: "14px 18px" }}
-                >
-                  {l.photos?.[0] ? (
-                    <Image
-                      src={l.photos[0]}
-                      alt=""
-                      width={86}
-                      height={60}
-                      className="flex-none rounded-md object-cover"
-                      style={{ background: "var(--surface)" }}
-                    />
-                  ) : (
-                    <span className="block flex-none rounded-md" style={{ width: 86, height: 60, background: "var(--surface)" }} />
-                  )}
-                  <div className="flex min-w-0 flex-1 flex-col gap-[3px]">
-                    <span className="font-serif-display" style={{ fontSize: 19 }}>
-                      {l.title}
-                    </span>
-                    <span style={{ fontSize: 11.5, color: "rgba(var(--ink-rgb),.5)", letterSpacing: ".04em" }}>
-                      {c.label} · {priceLabel(l)} · {(l.photos || []).length} photos
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      remove(l.id);
-                    }}
-                    className="cursor-pointer border bg-transparent transition-colors hover:!border-[#c96a5a] hover:!text-[#c96a5a]"
-                    style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".12em", padding: "9px 16px", color: "rgba(var(--ink-rgb),.4)", borderColor: "rgba(var(--ink-rgb),.12)" }}
-                  >
-                    REMOVE
-                  </button>
-                </div>
-              );
-            })}
+            {listings.filter((l) => !l.archived).map((l) => (
+              <ListingRow
+                key={l.id}
+                listing={l}
+                actionLabel="ARCHIVE"
+                onOpen={() => startEdit(l)}
+                onAction={() => setArchived(l.id, true)}
+              />
+            ))}
           </div>
+          {listings.some((l) => l.archived) && (
+            <details className="mt-10">
+              <summary
+                className="cursor-pointer select-none"
+                style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".18em", color: "rgba(var(--ink-rgb),.5)", marginBottom: 14 }}
+              >
+                ARCHIVED ({listings.filter((l) => l.archived).length})
+              </summary>
+              <div
+                className="flex flex-col overflow-hidden rounded-xl border"
+                style={{ gap: 1, background: "rgba(var(--ink-rgb),.09)", borderColor: "rgba(var(--ink-rgb),.09)" }}
+              >
+                {listings.filter((l) => l.archived).map((l) => (
+                  <ListingRow
+                    key={l.id}
+                    listing={l}
+                    actionLabel="RESTORE"
+                    onOpen={() => startEdit(l)}
+                    onAction={() => setArchived(l.id, false)}
+                  />
+                ))}
+              </div>
+            </details>
+          )}
           {error && <p style={{ fontSize: 13, color: "#c96a5a", marginTop: 16 }}>{error}</p>}
         </>
       )}
