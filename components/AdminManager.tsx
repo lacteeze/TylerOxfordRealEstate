@@ -315,6 +315,13 @@ export default function AdminManager({ initialListings }: { initialListings: Lis
     router.refresh();
   }
 
+  function closeEditor() {
+    setEditing(null);
+    setForm(blankForm());
+    setError("");
+    setDriveImport("");
+  }
+
   async function signOut() {
     await supabase.auth.signOut();
     router.push("/");
@@ -369,16 +376,11 @@ export default function AdminManager({ initialListings }: { initialListings: Lis
           </button>
         </div>
       </div>
-      <h1 className="font-serif-display" style={{ margin: "0 0 8px", fontSize: "clamp(38px,4.5vw,60px)", lineHeight: 1, fontWeight: 500 }}>
-        Manage listings
-      </h1>
-      <p style={{ margin: "0 0 40px", fontSize: 13.5, color: "rgba(var(--ink-rgb),.55)", maxWidth: 560 }}>
-        Add, edit or remove properties. Photos upload to secure cloud storage and appear on
-        the site instantly.
-      </p>
-
-      {editing === null && (
-        <>
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="font-serif-display m-0" style={{ fontSize: "clamp(38px,4.5vw,60px)", lineHeight: 1, fontWeight: 500 }}>
+          Manage listings
+        </h1>
+        {editing === null && (
           <button
             onClick={() => {
               setEditing("new");
@@ -386,11 +388,20 @@ export default function AdminManager({ initialListings }: { initialListings: Lis
               setError("");
               setDriveImport("");
             }}
-            className="mb-6 cursor-pointer border-none transition-colors hover:!bg-[var(--gold-hov)]"
+            className="flex-none cursor-pointer border-none transition-colors hover:!bg-[var(--gold-hov)]"
             style={{ fontSize: 12, fontWeight: 600, letterSpacing: ".08em", padding: "14px 24px", background: "var(--gold)", color: "var(--gold-ink)" }}
           >
             ＋ NEW LISTING
           </button>
+        )}
+      </div>
+      <p style={{ margin: "8px 0 40px", fontSize: 13.5, color: "rgba(var(--ink-rgb),.55)", maxWidth: 560 }}>
+        Add, edit or remove properties. Photos upload to secure cloud storage and appear on
+        the site instantly.
+      </p>
+
+      {editing === null && (
+        <>
           <div
             className="flex flex-col overflow-hidden rounded-xl border"
             style={{ gap: 1, background: "rgba(var(--ink-rgb),.09)", borderColor: "rgba(var(--ink-rgb),.09)" }}
@@ -450,9 +461,19 @@ export default function AdminManager({ initialListings }: { initialListings: Lis
           className="flex flex-col gap-6 rounded-[14px] border"
           style={{ borderColor: "rgba(var(--ink-rgb),.12)", background: "var(--bg2)", padding: "clamp(24px,3vw,40px)" }}
         >
-          <span className="font-serif-display" style={{ fontSize: 26 }}>
-            {editing === "new" ? "New listing" : `Edit — ${form.title || "listing"}`}
-          </span>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span className="font-serif-display" style={{ fontSize: 26 }}>
+              {editing === "new" ? "New listing" : `Edit — ${form.title || "listing"}`}
+            </span>
+            <button
+              type="button"
+              onClick={closeEditor}
+              className="flex-none cursor-pointer border bg-transparent transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)]"
+              style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".12em", padding: "9px 16px", color: "var(--ink)", borderColor: "rgba(var(--ink-rgb),.25)" }}
+            >
+              ← LISTINGS
+            </button>
+          </div>
 
           <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,260px),1fr))", gap: "18px 20px" }}>
             <label className="flex flex-col gap-1.5" style={{ gridColumn: "1/-1" }}>
@@ -673,12 +694,7 @@ export default function AdminManager({ initialListings }: { initialListings: Lis
               {busy ? "SAVING…" : "SAVE LISTING"}
             </button>
             <button
-              onClick={() => {
-                setEditing(null);
-                setForm(blankForm());
-                setError("");
-                setDriveImport("");
-              }}
+              onClick={closeEditor}
               className="cursor-pointer border bg-transparent transition-colors hover:!border-[var(--ink)] hover:!text-[var(--ink)]"
               style={{ fontSize: 12, fontWeight: 600, letterSpacing: ".08em", padding: "14px 26px", color: "rgba(var(--ink-rgb),.7)", borderColor: "rgba(var(--ink-rgb),.25)" }}
             >
