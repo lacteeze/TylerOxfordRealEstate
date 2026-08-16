@@ -2,7 +2,14 @@
 
 import { useState, useTransition } from "react";
 import { submitLead } from "@/app/actions";
-import { MEDIA_SERVICES, type MediaService } from "@/lib/types";
+import MediaCheckout from "@/components/MediaCheckout";
+import {
+  PROPERTY_TYPES,
+  type InquiryIntent,
+  type PropertyPrefs,
+  type PropertyType,
+} from "@/lib/inquiry";
+import type { ServiceId } from "@/lib/pricing";
 
 const labelStyle: React.CSSProperties = {
   fontSize: 11.5,
@@ -19,9 +26,21 @@ const fieldStyle: React.CSSProperties = {
   fontSize: 13.5,
 };
 
+function toggleChipStyle(active: boolean): React.CSSProperties {
+  return {
+    fontSize: 12.5,
+    fontWeight: 500,
+    padding: "10px 18px",
+    background: active ? "var(--navy)" : "var(--card)",
+    color: active ? "#fff" : "var(--ink)",
+  };
+}
+
 export default function ContactForm() {
   const [kind, setKind] = useState<"real_estate" | "media">("real_estate");
-  const [services, setServices] = useState<MediaService[]>([]);
+  const [services, setServices] = useState<ServiceId[]>([]);
+  const [intent, setIntent] = useState<InquiryIntent | null>(null);
+  const [prefs, setPrefs] = useState<PropertyPrefs>({});
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -30,11 +49,28 @@ export default function ContactForm() {
   const [sent, setSent] = useState(false);
   const [pending, startTransition] = useTransition();
 
+  function updatePref<K extends keyof PropertyPrefs>(key: K, value: PropertyPrefs[K]) {
+    setPrefs((prev) => {
+      const next = { ...prev, [key]: value };
+      if (!value) delete next[key];
+      return next;
+    });
+  }
+
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     startTransition(async () => {
-      const res = await submitLead({ kind, name, email, phone, message, services });
+      const res = await submitLead({
+        kind,
+        name,
+        email,
+        phone,
+        message,
+        services,
+        intent,
+        propertyPrefs: prefs,
+      });
       if (res.ok) setSent(true);
       else setError(res.error || "Something went wrong.");
     });
@@ -53,6 +89,8 @@ export default function ContactForm() {
     );
   }
 
+  const mediaBlocked = kind === "media" && services.length === 0;
+
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-4">
       <div className="flex flex-wrap gap-2.5">
@@ -67,50 +105,92 @@ export default function ContactForm() {
             type="button"
             onClick={() => setKind(k)}
             className="cursor-pointer rounded-full border-none transition-colors"
-            style={{
-              fontSize: 12.5,
-              fontWeight: 500,
-              padding: "10px 18px",
-              background: kind === k ? "var(--navy)" : "var(--card)",
-              color: kind === k ? "#fff" : "var(--ink)",
-            }}
+            style={toggleChipStyle(kind === k)}
           >
             {label}
           </button>
         ))}
       </div>
-      {kind === "media" && (
-        <div className="flex flex-col gap-1.5">
-          <span style={labelStyle}>What would you like?</span>
-          <div className="flex flex-wrap gap-2">
-            {MEDIA_SERVICES.map((s) => {
-              const active = services.includes(s);
-              return (
+
+      {kind === "real_estate" && (
+        <div className="flex flex-col gap-3.5">
+          <div className="flex flex-col gap-1.5">
+            <span style={labelStyle}>I&apos;m looking to</span>
+            <div className="flex flex-wrap gap-2.5">
+              {(
+                [
+                  ["buying", "Buying"],
+                  ["selling", "Selling"],
+                ] as const
+              ).map(([value, label]) => (
                 <button
-                  key={s}
+                  key={value}
                   type="button"
-                  aria-pressed={active}
-                  onClick={() =>
-                    setServices((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]))
-                  }
-                  className="cursor-pointer rounded-full transition-colors"
-                  style={{
-                    fontSize: 12.5,
-                    fontWeight: 500,
-                    padding: "9px 16px",
-                    border: active ? "1px solid var(--navy)" : "1px solid var(--line)",
-                    background: active ? "var(--navy)" : "var(--card)",
-                    color: active ? "#fff" : "var(--ink)",
-                  }}
+                  aria-pressed={intent === value}
+                  onClick={() => setIntent(value)}
+                  className="cursor-pointer rounded-full border-none transition-colors"
+                  style={toggleChipStyle(intent === value)}
                 >
-                  {active ? "✓ " : ""}
-                  {s}
+                  {label}
                 </button>
-              );
-            })}
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <span style={labelStyle}>
+              {intent === "selling" ? "What are you selling?" : "What are you looking for?"}
+            </span>
+            <div className="grid grid-cols-2 gap-2.5">
+              {(
+                [
+                  ["beds", "Beds", "3"],
+                  ["baths", "Baths", "2"],
+                  ["parking", "Parking", "1"],
+                  ["area", "Area", "Downtown"],
+                ] as const
+              ).map(([key, label, placeholder]) => (
+                <label key={key} className="flex flex-col gap-1">
+                  <span style={{ ...labelStyle, fontWeight: 500 }}>{label}</span>
+                  <input
+                    value={prefs[key] ?? ""}
+                    onChange={(e) => updatePref(key, e.target.value)}
+                    style={{ ...fieldStyle, padding: "10px 12px" }}
+                    placeholder={placeholder}
+                  />
+                </label>
+              ))}
+            </div>
+            <div className="mt-1 flex flex-wrap gap-2">
+              {PROPERTY_TYPES.map((type: PropertyType) => {
+                const active = prefs.propertyType === type;
+                return (
+                  <button
+                    key={type}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => updatePref("propertyType", active ? undefined : type)}
+                    className="cursor-pointer rounded-full transition-colors"
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 500,
+                      padding: "7px 12px",
+                      border: active ? "1px solid var(--navy)" : "1px solid var(--line)",
+                      background: active ? "var(--navy)" : "var(--card)",
+                      color: active ? "#fff" : "var(--ink)",
+                    }}
+                  >
+                    {type}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}
+
+      {kind === "media" && <MediaCheckout selected={services} onChange={setServices} />}
+
       <label className="flex flex-col gap-1.5">
         <span style={labelStyle}>Name *</span>
         <input value={name} onChange={(e) => setName(e.target.value)} style={fieldStyle} placeholder="Your name" />
@@ -135,14 +215,14 @@ export default function ContactForm() {
           placeholder={
             kind === "media"
               ? "Tell us about the property and what you need shot…"
-              : "Buying, selling, or just curious — what can Tyler help with?"
+              : "Anything else Tyler should know?"
           }
         />
       </label>
       {error && <span style={{ fontSize: 13, color: "#b4483a" }}>{error}</span>}
       <button
         type="submit"
-        disabled={pending}
+        disabled={pending || mediaBlocked}
         className="pill-navy self-start disabled:opacity-60"
         style={{ padding: "13px 26px", fontWeight: 600 }}
       >

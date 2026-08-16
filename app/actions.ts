@@ -2,7 +2,14 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { notifyLeadBySms } from "@/lib/pingram";
-import { MEDIA_SERVICES, type MediaService } from "@/lib/types";
+import {
+  isInquiryIntent,
+  sanitizePropertyPrefs,
+  type InquiryIntent,
+  type PropertyPrefs,
+} from "@/lib/inquiry";
+import { isServiceId, type ServiceId } from "@/lib/pricing";
+import { priceCart, type PriceResult } from "@/lib/pricing-engine";
 
 export interface LeadInput {
   kind: "real_estate" | "media";
@@ -11,7 +18,13 @@ export interface LeadInput {
   phone: string;
   message: string;
   listing_id?: string | null;
-  services?: MediaService[];
+  services?: ServiceId[];
+  intent?: InquiryIntent | null;
+  propertyPrefs?: PropertyPrefs | null;
+}
+
+export interface LeadNotification extends LeadInput {
+  quote?: PriceResult | null;
 }
 
 export async function submitLead(
@@ -22,28 +35,47 @@ export async function submitLead(
   if (!(input.email || "").trim() && !(input.phone || "").trim())
     return { ok: false, error: "Leave an email or phone number so Tyler can reach you." };
 
-  // Only accept known service values, and only for media bookings.
+  const kind = input.kind === "media" ? "media" : "real_estate";
+
   const services =
-    input.kind === "media"
-      ? (input.services || []).filter((s): s is MediaService => (MEDIA_SERVICES as readonly string[]).includes(s))
-      : [];
+    kind === "media" ? (input.services || []).filter(isServiceId) : [];
+  if (kind === "media" && services.length === 0) {
+    return { ok: false, error: "Pick at least one service." };
+  }
+
+  const quote = kind === "media" ? priceCart(services) : null;
+  const intent =
+    kind === "real_estate" && input.intent && isInquiryIntent(input.intent) ? input.intent : null;
+  const propertyPrefs = kind === "real_estate" ? sanitizePropertyPrefs(input.propertyPrefs) : null;
 
   const supabase = await createClient();
   const { error } = await supabase.from("leads").insert({
-    kind: input.kind === "media" ? "media" : "real_estate",
+    kind,
     name,
     email: (input.email || "").trim(),
     phone: (input.phone || "").trim(),
     message: (input.message || "").trim(),
     listing_id: input.listing_id || null,
     services: services.length ? services : null,
+    quote_cents: quote ? quote.total : null,
+    quote_line_items: quote ? quote.lineItems : null,
+    intent,
+    property_prefs: propertyPrefs,
   });
 
   if (error) return { ok: false, error: "Something went wrong — please try again." };
 
   // SMS failures shouldn't break the form — the lead is already saved in Supabase.
   try {
-    await notifyLeadBySms({ ...input, name, services });
+    await notifyLeadBySms({
+      ...input,
+      kind,
+      name,
+      services,
+      intent,
+      propertyPrefs,
+      quote,
+    });
   } catch (e) {
     console.error("Lead saved but SMS notification failed:", e);
   }
