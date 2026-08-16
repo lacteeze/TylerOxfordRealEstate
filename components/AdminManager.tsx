@@ -447,17 +447,6 @@ export default function AdminManager({ initialListings }: { initialListings: Lis
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      startEdit(l);
-                    }}
-                    className="cursor-pointer border bg-transparent transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)]"
-                    style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".12em", padding: "9px 16px", color: "var(--ink)", borderColor: "rgba(var(--ink-rgb),.25)" }}
-                  >
-                    EDIT
-                  </button>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
                       remove(l.id);
                     }}
                     className="cursor-pointer border bg-transparent transition-colors hover:!border-[#c96a5a] hover:!text-[#c96a5a]"
