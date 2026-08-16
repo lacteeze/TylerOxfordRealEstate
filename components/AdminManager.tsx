@@ -70,15 +70,6 @@ const fieldStyle: React.CSSProperties = {
   boxSizing: "border-box",
 };
 
-const ghostBtn: React.CSSProperties = {
-  fontSize: 11,
-  fontWeight: 600,
-  letterSpacing: ".12em",
-  padding: "9px 16px",
-  color: "rgba(var(--ink-rgb),.6)",
-  borderColor: "rgba(var(--ink-rgb),.2)",
-};
-
 function ListingRow({
   listing,
   actionLabel,
@@ -383,12 +374,6 @@ export default function AdminManager({ initialListings }: { initialListings: Lis
     setDriveImport("");
   }
 
-  async function signOut() {
-    await supabase.auth.signOut();
-    router.push("/");
-    router.refresh();
-  }
-
   function onPhotoStripDragOver(e: React.DragEvent) {
     e.preventDefault();
     if (Array.from(e.dataTransfer.types).includes("Files")) {
@@ -416,15 +401,6 @@ export default function AdminManager({ initialListings }: { initialListings: Lis
       className="max-w-[1100px]"
       style={{ padding: "clamp(44px,6vw,72px) clamp(20px,4vw,48px) clamp(64px,8vw,110px)", minHeight: "80vh" }}
     >
-      <div className="flex items-center justify-end gap-4">
-        <button
-          onClick={signOut}
-          className="cursor-pointer border bg-transparent transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)]"
-          style={ghostBtn}
-        >
-          SIGN OUT
-        </button>
-      </div>
       <div className="flex items-center justify-between gap-4">
         <h1 className="font-serif-display m-0" style={{ fontSize: "clamp(38px,4.5vw,60px)", lineHeight: 1, fontWeight: 500 }}>
           Manage listings

@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 const navLinks: [string, string][] = [
   ["/", "Home"],
@@ -16,10 +17,19 @@ const navLinks: [string, string][] = [
 export default function Header() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const isAdmin = pathname.startsWith("/admin");
   const links: [string, string][] = isAdmin
     ? [["/admin", "Manage"]]
     : navLinks;
+
+  async function signOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    setOpen(false);
+    router.push("/");
+    router.refresh();
+  }
 
   // Close the menu on navigation.
   useEffect(() => {
@@ -114,6 +124,9 @@ export default function Header() {
                   <Link href="/" onClick={() => setOpen(false)} className="pill-outline justify-center">
                     View site <span className="pill-arrow">↗</span>
                   </Link>
+                  <button type="button" onClick={signOut} className="pill-outline justify-center">
+                    Sign out
+                  </button>
                 </>
               ) : (
                 <>

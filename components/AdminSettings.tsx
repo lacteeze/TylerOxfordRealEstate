@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 
 export default function AdminSettings({
   configured,
@@ -37,13 +36,6 @@ export default function AdminSettings({
     router.refresh();
   }
 
-  async function signOut() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/");
-    router.refresh();
-  }
-
   const fieldNote: React.CSSProperties = {
     fontSize: 13.5,
     lineHeight: 1.65,
@@ -57,36 +49,20 @@ export default function AdminSettings({
       style={{ padding: "clamp(44px,6vw,72px) clamp(20px,4vw,48px) clamp(64px,8vw,110px)", minHeight: "80vh" }}
     >
       <div className="flex items-center justify-end gap-4">
-        <div className="flex items-center gap-3">
-          <Link
-            href="/admin"
-            className="btn-pill cursor-pointer border no-underline transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)]"
-            style={{
-              fontSize: 11,
-              fontWeight: 600,
-              letterSpacing: ".12em",
-              padding: "9px 16px",
-              color: "var(--ink)",
-              borderColor: "rgba(var(--ink-rgb),.25)",
-            }}
-          >
-            LISTINGS
-          </Link>
-          <button
-            onClick={signOut}
-            className="cursor-pointer border bg-transparent transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)]"
-            style={{
-              fontSize: 11,
-              fontWeight: 600,
-              letterSpacing: ".12em",
-              padding: "9px 16px",
-              color: "rgba(var(--ink-rgb),.6)",
-              borderColor: "rgba(var(--ink-rgb),.2)",
-            }}
-          >
-            SIGN OUT
-          </button>
-        </div>
+        <Link
+          href="/admin"
+          className="btn-pill cursor-pointer border no-underline transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)]"
+          style={{
+            fontSize: 11,
+            fontWeight: 600,
+            letterSpacing: ".12em",
+            padding: "9px 16px",
+            color: "var(--ink)",
+            borderColor: "rgba(var(--ink-rgb),.25)",
+          }}
+        >
+          LISTINGS
+        </Link>
       </div>
       <h1 className="font-serif-display" style={{ margin: "0 0 8px", fontSize: "clamp(38px,4.5vw,60px)", lineHeight: 1, fontWeight: 500 }}>
         Settings
