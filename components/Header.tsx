@@ -16,6 +16,14 @@ const navLinks: [string, string][] = [
 export default function Header() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const isAdmin = pathname.startsWith("/admin");
+  const links: [string, string][] = isAdmin
+    ? [
+        ["/admin", "Manage"],
+        ["/admin/settings", "Settings"],
+        ["/", "View site"],
+      ]
+    : navLinks;
 
   // Close the menu on navigation.
   useEffect(() => {
@@ -84,7 +92,7 @@ export default function Header() {
             style={{ background: "var(--bg)", border: "1px solid var(--line)", padding: "18px clamp(18px,2.5vw,28px)" }}
           >
             <nav className="flex flex-col gap-0 md:flex-row md:items-center md:gap-7">
-              {navLinks.map(([href, label]) => (
+              {links.map(([href, label]) => (
                 <Link
                   key={label}
                   href={href}
@@ -102,12 +110,25 @@ export default function Header() {
               ))}
             </nav>
             <div className="mt-3 flex flex-col gap-2.5 sm:flex-row md:mt-0">
-              <Link href="/#contact" onClick={() => setOpen(false)} className="pill-navy justify-center">
-                Work with Tyler <span className="pill-arrow">↗</span>
-              </Link>
-              <Link href="/#contact" onClick={() => setOpen(false)} className="pill-outline justify-center">
-                Book the studio <span className="pill-arrow">↗</span>
-              </Link>
+              {isAdmin ? (
+                <>
+                  <Link href="/admin/settings" onClick={() => setOpen(false)} className="pill-navy justify-center">
+                    Settings <span className="pill-arrow">↗</span>
+                  </Link>
+                  <Link href="/" onClick={() => setOpen(false)} className="pill-outline justify-center">
+                    View site <span className="pill-arrow">↗</span>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link href="/#contact" onClick={() => setOpen(false)} className="pill-navy justify-center">
+                    Work with Tyler <span className="pill-arrow">↗</span>
+                  </Link>
+                  <Link href="/#contact" onClick={() => setOpen(false)} className="pill-outline justify-center">
+                    Book the studio <span className="pill-arrow">↗</span>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

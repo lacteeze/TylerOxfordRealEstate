@@ -19,6 +19,8 @@ export interface Listing {
   blurb: string;
   description: string;
   photos: string[];
+  drive_folder_id?: string;
+  drive_folder_url?: string;
   created_at?: string;
   updated_at?: string;
 }

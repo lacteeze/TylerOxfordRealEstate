@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Poppins, Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import ConditionalFooter from "@/components/ConditionalFooter";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -31,7 +31,7 @@ export default function RootLayout({
         <div className="page-shell">
           <Header />
           {children}
-          <Footer />
+          <ConditionalFooter />
         </div>
       </body>
     </html>
