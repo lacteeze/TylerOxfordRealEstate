@@ -416,26 +416,14 @@ export default function AdminManager({ initialListings }: { initialListings: Lis
       className="max-w-[1100px]"
       style={{ padding: "clamp(44px,6vw,72px) clamp(20px,4vw,48px) clamp(64px,8vw,110px)", minHeight: "80vh" }}
     >
-      <div className="flex items-center justify-between gap-4">
-        <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".3em", color: "var(--gold)", marginBottom: 14 }}>
-          PRIVATE — TYLER ONLY
-        </div>
-        <div className="flex items-center gap-3">
-          <Link
-            href="/admin/settings"
-            className="cursor-pointer border no-underline transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)]"
-            style={{ ...ghostBtn, color: "var(--ink)", borderColor: "rgba(var(--ink-rgb),.25)" }}
-          >
-            SETTINGS
-          </Link>
-          <button
-            onClick={signOut}
-            className="cursor-pointer border bg-transparent transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)]"
-            style={ghostBtn}
-          >
-            SIGN OUT
-          </button>
-        </div>
+      <div className="flex items-center justify-end gap-4">
+        <button
+          onClick={signOut}
+          className="cursor-pointer border bg-transparent transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)]"
+          style={ghostBtn}
+        >
+          SIGN OUT
+        </button>
       </div>
       <div className="flex items-center justify-between gap-4">
         <h1 className="font-serif-display m-0" style={{ fontSize: "clamp(38px,4.5vw,60px)", lineHeight: 1, fontWeight: 500 }}>
@@ -704,7 +692,7 @@ export default function AdminManager({ initialListings }: { initialListings: Lis
                 </div>
               ))}
               <label
-                className="flex cursor-pointer flex-col items-center justify-center gap-1.5 transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)]"
+                className="btn-pill flex cursor-pointer flex-col items-center justify-center gap-1.5 transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)]"
                 style={{
                   width: dropActive ? 220 : 150,
                   height: 104,

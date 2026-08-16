@@ -172,6 +172,13 @@ button {
   font-family: var(--font-body), Poppins, sans-serif;
 }
 
+/* Shared pill radius for action buttons and link-buttons.
+   Square icon controls stay circular via equal width/height. */
+button,
+.btn-pill {
+  border-radius: 999px;
+}
+
 input:focus,
 textarea:focus,
 select:focus {

@@ -18,11 +18,7 @@ export default function Header() {
   const pathname = usePathname();
   const isAdmin = pathname.startsWith("/admin");
   const links: [string, string][] = isAdmin
-    ? [
-        ["/admin", "Manage"],
-        ["/admin/settings", "Settings"],
-        ["/", "View site"],
-      ]
+    ? [["/admin", "Manage"]]
     : navLinks;
 
   // Close the menu on navigation.

@@ -26,9 +26,6 @@ export default function AdminLogin() {
         style={{ background: "var(--bg2)", borderColor: "rgba(var(--ink-rgb),.12)", padding: "clamp(28px,4vw,44px)" }}
       >
         <div>
-          <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".3em", color: "var(--gold)", marginBottom: 12 }}>
-            PRIVATE — TYLER ONLY
-          </div>
           <h1 className="font-serif-display m-0" style={{ fontSize: 34, fontWeight: 500 }}>
             Sign in
           </h1>

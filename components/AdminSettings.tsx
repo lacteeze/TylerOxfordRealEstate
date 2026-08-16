@@ -56,14 +56,11 @@ export default function AdminSettings({
       className="max-w-[1100px]"
       style={{ padding: "clamp(44px,6vw,72px) clamp(20px,4vw,48px) clamp(64px,8vw,110px)", minHeight: "80vh" }}
     >
-      <div className="flex items-center justify-between gap-4">
-        <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".3em", color: "var(--gold)", marginBottom: 14 }}>
-          PRIVATE — TYLER ONLY
-        </div>
+      <div className="flex items-center justify-end gap-4">
         <div className="flex items-center gap-3">
           <Link
             href="/admin"
-            className="cursor-pointer border no-underline transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)]"
+            className="btn-pill cursor-pointer border no-underline transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)]"
             style={{
               fontSize: 11,
               fontWeight: 600,
@@ -95,8 +92,7 @@ export default function AdminSettings({
         Settings
       </h1>
       <p style={{ margin: "0 0 40px", ...fieldNote }}>
-        Connect Google Drive so listing photos can be imported from a shared folder. Requires{" "}
-        <code>GOOGLE_CLIENT_ID</code> and <code>GOOGLE_CLIENT_SECRET</code> in the server environment.
+        Connect Google Drive so listing photos can be imported from a shared folder.
       </p>
 
       <div
@@ -155,7 +151,7 @@ export default function AdminSettings({
             ) : (
               <a
                 href="/api/admin/google/connect"
-                className="inline-block cursor-pointer border-none no-underline transition-colors hover:!bg-[var(--gold-hov)]"
+                className="btn-pill inline-block cursor-pointer border-none no-underline transition-colors hover:!bg-[var(--gold-hov)]"
                 style={{
                   fontSize: 12,
                   fontWeight: 600,
