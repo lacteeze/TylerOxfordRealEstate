@@ -1,30 +1,13 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { useActionState } from "react";
+import { signIn, type SignInState } from "./actions";
 
 export default function AdminLogin() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [busy, setBusy] = useState(false);
-
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    setError("");
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setBusy(false);
-    if (error) {
-      setError("Invalid email or password.");
-      return;
-    }
-    router.push("/admin");
-    router.refresh();
-  }
+  const [state, formAction, pending] = useActionState<SignInState, FormData>(
+    signIn,
+    undefined
+  );
 
   const fieldStyle: React.CSSProperties = {
     background: "var(--field)",
@@ -38,7 +21,7 @@ export default function AdminLogin() {
   return (
     <div className="flex min-h-[70vh] items-center justify-center" style={{ padding: "clamp(44px,6vw,72px) clamp(20px,4vw,48px)" }}>
       <form
-        onSubmit={onSubmit}
+        action={formAction}
         className="flex w-full max-w-[420px] flex-col gap-5 rounded-[14px] border"
         style={{ background: "var(--bg2)", borderColor: "rgba(var(--ink-rgb),.12)", padding: "clamp(28px,4vw,44px)" }}
       >
@@ -52,20 +35,36 @@ export default function AdminLogin() {
         </div>
         <label className="flex flex-col gap-1.5">
           <span style={{ fontSize: 10.5, fontWeight: 600, letterSpacing: ".18em", color: "rgba(var(--ink-rgb),.55)" }}>EMAIL</span>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} style={fieldStyle} autoComplete="email" />
+          <input
+            type="email"
+            name="email"
+            required
+            style={fieldStyle}
+            autoComplete="email"
+          />
         </label>
         <label className="flex flex-col gap-1.5">
           <span style={{ fontSize: 10.5, fontWeight: 600, letterSpacing: ".18em", color: "rgba(var(--ink-rgb),.55)" }}>PASSWORD</span>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} style={fieldStyle} autoComplete="current-password" />
+          <input
+            type="password"
+            name="password"
+            required
+            style={fieldStyle}
+            autoComplete="current-password"
+          />
         </label>
-        {error && <span style={{ fontSize: 13, color: "#c96a5a" }}>{error}</span>}
+        {state?.error && (
+          <span role="alert" style={{ fontSize: 13, color: "#c96a5a", lineHeight: 1.45 }}>
+            {state.error}
+          </span>
+        )}
         <button
           type="submit"
-          disabled={busy}
+          disabled={pending}
           className="cursor-pointer border-none transition-colors hover:!bg-[var(--gold-hov)] disabled:opacity-60"
           style={{ fontSize: 12, fontWeight: 600, letterSpacing: ".08em", padding: "14px 26px", background: "var(--gold)", color: "var(--gold-ink)" }}
         >
-          {busy ? "SIGNING IN…" : "SIGN IN"}
+          {pending ? "SIGNING IN…" : "SIGN IN"}
         </button>
       </form>
     </div>
