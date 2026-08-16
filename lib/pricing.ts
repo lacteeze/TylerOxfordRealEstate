@@ -73,6 +73,21 @@ export const PACKAGES: readonly PackageDef[] = [
 /** Upsell only if the upgrade total is within this window of the current quote. */
 export const UPGRADE_WINDOW_CENTS = 5_000;
 
+/** First N km from St. John's are included; only excess km are billed. */
+export const TRAVEL_FREE_KM = 40;
+
+/** $0.75 CAD per km beyond TRAVEL_FREE_KM (seventy-five cents, not 0.75 cents). */
+export const TRAVEL_CENTS_PER_KM = 75;
+
+/**
+ * Fixed travel origin for media bookings: downtown St. John's harbour.
+ * Approx. 47.5615° N, 52.7126° W.
+ */
+export const ST_JOHNS_ORIGIN = {
+  lat: 47.5615,
+  lng: -52.7126,
+} as const;
+
 export function isServiceId(value: string): value is ServiceId {
   return (SERVICE_IDS as readonly string[]).includes(value);
 }

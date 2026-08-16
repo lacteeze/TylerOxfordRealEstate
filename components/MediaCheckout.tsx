@@ -1,9 +1,12 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+import { previewMediaTravel } from "@/app/actions";
 import {
   PACKAGES,
   SERVICES,
   SERVICE_BY_ID,
+  TRAVEL_FREE_KM,
   formatCad,
   type ServiceId,
 } from "@/lib/pricing";
@@ -21,6 +24,21 @@ const labelStyle: React.CSSProperties = {
   fontWeight: 600,
   color: "rgba(var(--ink-rgb),.6)",
 };
+
+const fieldStyle: React.CSSProperties = {
+  background: "var(--card)",
+  border: "1px solid transparent",
+  color: "var(--ink)",
+  borderRadius: 12,
+  padding: "12px 16px",
+  fontSize: 13.5,
+};
+
+export type TravelPreview =
+  | { status: "idle" }
+  | { status: "pending" }
+  | { status: "ok"; km: number; excessKm: number; travelCents: number }
+  | { status: "error"; error: string };
 
 function upgradeCopy(upgrade: UpgradeSuggestion): string {
   const names = upgrade.servicesGained.map((id) => SERVICE_BY_ID[id].name);
@@ -41,13 +59,65 @@ function upgradeCopy(upgrade: UpgradeSuggestion): string {
 export default function MediaCheckout({
   selected,
   onChange,
+  serviceAddress,
+  onServiceAddressChange,
+  travel,
+  onTravelChange,
 }: {
   selected: ServiceId[];
   onChange: (next: ServiceId[]) => void;
+  serviceAddress: string;
+  onServiceAddressChange: (value: string) => void;
+  travel: TravelPreview;
+  onTravelChange: (next: TravelPreview) => void;
 }) {
-  const quote = priceCart(selected);
+  const lastOk = useRef<{ key: string; result: Extract<TravelPreview, { status: "ok" }> } | null>(
+    null
+  );
+  const requestId = useRef(0);
+
+  useEffect(() => {
+    const trimmed = serviceAddress.trim().replace(/\s+/g, " ");
+    if (trimmed.length < 3) {
+      onTravelChange({ status: "idle" });
+      return;
+    }
+
+    const key = trimmed.toLowerCase();
+    if (lastOk.current?.key === key) {
+      onTravelChange(lastOk.current.result);
+      return;
+    }
+
+    onTravelChange({ status: "pending" });
+    const id = ++requestId.current;
+    const timer = setTimeout(async () => {
+      const res = await previewMediaTravel(trimmed);
+      if (id !== requestId.current) return;
+      if (res.ok) {
+        const result: Extract<TravelPreview, { status: "ok" }> = {
+          status: "ok",
+          km: res.km,
+          excessKm: res.excessKm,
+          travelCents: res.travelCents,
+        };
+        lastOk.current = { key, result };
+        onTravelChange(result);
+      } else {
+        onTravelChange({ status: "error", error: res.error });
+      }
+    }, 500);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [serviceAddress, onTravelChange]);
+
+  const travelCents = travel.status === "ok" ? travel.travelCents : 0;
+  const quote = priceCart(selected, travelCents);
   const upgrade = suggestUpgrade(selected);
   const matched = matchingPackageId(selected);
+  const struckCents = quote.alaCarteTotal + travelCents;
 
   function toggle(id: ServiceId) {
     onChange(selected.includes(id) ? selected.filter((x) => x !== id) : [...selected, id]);
@@ -140,6 +210,21 @@ export default function MediaCheckout({
         </div>
       </div>
 
+      <label className="flex flex-col gap-1.5">
+        <span style={labelStyle}>Service address *</span>
+        <input
+          value={serviceAddress}
+          onChange={(e) => onServiceAddressChange(e.target.value)}
+          style={fieldStyle}
+          placeholder="Street and city (e.g. 123 Water St, St. John's)"
+          autoComplete="street-address"
+          required
+        />
+        <span style={{ fontSize: 11.5, color: "rgba(var(--ink-rgb),.5)" }}>
+          Travel is included within {TRAVEL_FREE_KM} km of St. John&apos;s.
+        </span>
+      </label>
+
       <div
         className="sticky bottom-2 flex flex-col gap-2 rounded-[14px]"
         style={{
@@ -149,9 +234,19 @@ export default function MediaCheckout({
         }}
       >
         {selected.length === 0 ? (
-          <span style={{ fontSize: 12.5, color: "rgba(var(--ink-rgb),.55)" }}>
-            Choose a package or services to see your quote.
-          </span>
+          <>
+            <span style={{ fontSize: 12.5, color: "rgba(var(--ink-rgb),.55)" }}>
+              Choose a package or services to see your quote.
+            </span>
+            {travel.status === "error" && (
+              <span style={{ fontSize: 12.5, color: "#b4483a" }}>{travel.error}</span>
+            )}
+            {travel.status === "pending" && (
+              <span style={{ fontSize: 12.5, color: "rgba(var(--ink-rgb),.55)" }}>
+                Estimating travel…
+              </span>
+            )}
+          </>
         ) : (
           <>
             <div className="flex flex-col gap-1">
@@ -166,6 +261,35 @@ export default function MediaCheckout({
                 </div>
               ))}
             </div>
+            {travel.status === "ok" && travel.travelCents <= 0 && (
+              <div
+                className="flex items-baseline justify-between gap-3"
+                style={{ fontSize: 12.5, color: "rgba(var(--ink-rgb),.7)" }}
+              >
+                <span>
+                  Travel · about {travel.km} km from St. John&apos;s
+                </span>
+                <span style={{ fontWeight: 600 }}>Included</span>
+              </div>
+            )}
+            {travel.status === "ok" && travel.travelCents > 0 && (
+              <span style={{ fontSize: 11.5, color: "rgba(var(--ink-rgb),.5)" }}>
+                About {travel.km} km from St. John&apos;s
+              </span>
+            )}
+            {travel.status === "pending" && (
+              <span style={{ fontSize: 12.5, color: "rgba(var(--ink-rgb),.55)" }}>
+                Estimating travel…
+              </span>
+            )}
+            {travel.status === "error" && (
+              <span style={{ fontSize: 12.5, color: "#b4483a" }}>{travel.error}</span>
+            )}
+            {travel.status === "idle" && (
+              <span style={{ fontSize: 12.5, color: "rgba(var(--ink-rgb),.55)" }}>
+                Enter a service address to include travel.
+              </span>
+            )}
             <div
               className="flex items-baseline justify-between gap-3 pt-1.5"
               style={{ borderTop: "1px solid var(--line)" }}
@@ -180,7 +304,7 @@ export default function MediaCheckout({
                       textDecoration: "line-through",
                     }}
                   >
-                    {formatCad(quote.alaCarteTotal)}
+                    {formatCad(struckCents)}
                   </span>
                 )}
                 <span className="font-display" style={{ fontSize: 18, fontWeight: 600 }}>

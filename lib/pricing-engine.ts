@@ -2,6 +2,7 @@ import {
   PACKAGES,
   SERVICES,
   SERVICE_BY_ID,
+  TRAVEL_CENTS_PER_KM,
   UPGRADE_WINDOW_CENTS,
   alaCarteCents,
   isServiceId,
@@ -9,12 +10,13 @@ import {
   type PackageId,
   type ServiceId,
 } from "./pricing";
+import { travelFeeCents, travelLineName } from "./travel";
 
-export type LineItemKind = "package" | "service";
+export type LineItemKind = "package" | "service" | "travel";
 
 export interface LineItem {
   kind: LineItemKind;
-  id: PackageId | ServiceId;
+  id: PackageId | ServiceId | "travel";
   name: string;
   priceCents: number;
 }
@@ -61,13 +63,40 @@ export function packageSavingsCents(pkg: PackageDef): number {
   return alaCarteCents(pkg.services) - pkg.priceCents;
 }
 
-export function priceCart(selectedServiceIds: ServiceId[]): PriceResult {
+/** Adds a travel line when the fee is greater than zero. Packages never absorb travel. */
+export function withTravelFee(quote: PriceResult, travelCents: number): PriceResult {
+  const cents = Math.max(0, Math.round(travelCents));
+  if (cents <= 0) return quote;
+  const excessKm = cents / TRAVEL_CENTS_PER_KM;
+  return {
+    ...quote,
+    total: quote.total + cents,
+    lineItems: [
+      ...quote.lineItems,
+      {
+        kind: "travel",
+        id: "travel",
+        name: travelLineName(excessKm),
+        priceCents: cents,
+      },
+    ],
+  };
+}
+
+export function applyTravel(quote: PriceResult, distanceKm: number): PriceResult {
+  return withTravelFee(quote, travelFeeCents(distanceKm));
+}
+
+export function priceCart(selectedServiceIds: ServiceId[], travelCents = 0): PriceResult {
   const selected = uniqueInCatalogOrder(selectedServiceIds);
   const selectedSet = new Set(selected);
   const alaCarteTotal = alaCarteCents(selected);
 
   if (selected.length === 0) {
-    return { total: 0, lineItems: [], alaCarteTotal: 0, savings: 0 };
+    return withTravelFee(
+      { total: 0, lineItems: [], alaCarteTotal: 0, savings: 0 },
+      travelCents
+    );
   }
 
   let bestPkg: PackageDef | null = null;
@@ -105,12 +134,15 @@ export function priceCart(selectedServiceIds: ServiceId[]): PriceResult {
     });
   }
 
-  return {
-    total: bestTotal,
-    lineItems,
-    alaCarteTotal,
-    savings: alaCarteTotal - bestTotal,
-  };
+  return withTravelFee(
+    {
+      total: bestTotal,
+      lineItems,
+      alaCarteTotal,
+      savings: alaCarteTotal - bestTotal,
+    },
+    travelCents
+  );
 }
 
 export function suggestUpgrade(selectedServiceIds: ServiceId[]): UpgradeSuggestion | null {

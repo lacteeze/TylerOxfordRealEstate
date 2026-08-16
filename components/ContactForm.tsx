@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { submitLead } from "@/app/actions";
-import MediaCheckout from "@/components/MediaCheckout";
+import MediaCheckout, { type TravelPreview } from "@/components/MediaCheckout";
 import {
   PROPERTY_TYPES,
   type InquiryIntent,
@@ -41,6 +41,8 @@ export default function ContactForm() {
   const [services, setServices] = useState<ServiceId[]>([]);
   const [intent, setIntent] = useState<InquiryIntent | null>(null);
   const [prefs, setPrefs] = useState<PropertyPrefs>({});
+  const [serviceAddress, setServiceAddress] = useState("");
+  const [travel, setTravel] = useState<TravelPreview>({ status: "idle" });
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -70,6 +72,7 @@ export default function ContactForm() {
         services,
         intent,
         propertyPrefs: prefs,
+        serviceAddress,
       });
       if (res.ok) setSent(true);
       else setError(res.error || "Something went wrong.");
@@ -89,7 +92,11 @@ export default function ContactForm() {
     );
   }
 
-  const mediaBlocked = kind === "media" && services.length === 0;
+  const mediaBlocked =
+    kind === "media" &&
+    (services.length === 0 || !serviceAddress.trim() || travel.status !== "ok");
+  const sellingBlocked =
+    kind === "real_estate" && intent === "selling" && !(prefs.address || "").trim();
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-4">
@@ -136,6 +143,20 @@ export default function ContactForm() {
               ))}
             </div>
           </div>
+
+          {intent === "selling" && (
+            <label className="flex flex-col gap-1.5">
+              <span style={labelStyle}>Property address *</span>
+              <input
+                value={prefs.address ?? ""}
+                onChange={(e) => updatePref("address", e.target.value)}
+                style={fieldStyle}
+                placeholder="Street and city (e.g. 123 Water St, St. John's)"
+                autoComplete="street-address"
+                required
+              />
+            </label>
+          )}
 
           <div className="flex flex-col gap-1.5">
             <span style={labelStyle}>
@@ -189,7 +210,16 @@ export default function ContactForm() {
         </div>
       )}
 
-      {kind === "media" && <MediaCheckout selected={services} onChange={setServices} />}
+      {kind === "media" && (
+        <MediaCheckout
+          selected={services}
+          onChange={setServices}
+          serviceAddress={serviceAddress}
+          onServiceAddressChange={setServiceAddress}
+          travel={travel}
+          onTravelChange={setTravel}
+        />
+      )}
 
       <label className="flex flex-col gap-1.5">
         <span style={labelStyle}>Name *</span>
@@ -222,11 +252,12 @@ export default function ContactForm() {
       {error && <span style={{ fontSize: 13, color: "#b4483a" }}>{error}</span>}
       <button
         type="submit"
-        disabled={pending || mediaBlocked}
+        disabled={pending || mediaBlocked || sellingBlocked}
         className="pill-navy self-start disabled:opacity-60"
         style={{ padding: "13px 26px", fontWeight: 600 }}
       >
-        {pending ? "Sending…" : "Send message"} <span className="pill-arrow">↗</span>
+        {pending ? (kind === "media" ? "Booking…" : "Sending…") : kind === "media" ? "Book Now" : "Send message"}{" "}
+        <span className="pill-arrow">↗</span>
       </button>
     </form>
   );

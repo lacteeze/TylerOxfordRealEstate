@@ -9,6 +9,7 @@ export interface PropertyPrefs {
   baths?: string;
   parking?: string;
   area?: string;
+  address?: string;
   propertyType?: PropertyType;
 }
 
@@ -32,6 +33,11 @@ export function sanitizePropertyPrefs(raw: unknown): PropertyPrefs | null {
     }
   }
 
+  if (typeof input.address === "string") {
+    const address = input.address.trim().slice(0, 200);
+    if (address) prefs.address = address;
+  }
+
   if (typeof input.propertyType === "string" && isPropertyType(input.propertyType)) {
     prefs.propertyType = input.propertyType;
   }
@@ -42,6 +48,7 @@ export function sanitizePropertyPrefs(raw: unknown): PropertyPrefs | null {
 export function formatPropertyPrefs(prefs: PropertyPrefs | null | undefined): string | null {
   if (!prefs) return null;
   const parts = [
+    prefs.address,
     prefs.propertyType,
     prefs.beds ? `${prefs.beds} beds` : null,
     prefs.baths ? `${prefs.baths} baths` : null,
