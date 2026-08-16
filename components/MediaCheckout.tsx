@@ -137,12 +137,13 @@ export default function MediaCheckout({
                 type="button"
                 aria-pressed={active}
                 onClick={() => onChange([...pkg.services])}
-                className="relative flex cursor-pointer flex-col items-start gap-0.5 rounded-xl text-left transition-colors"
+                className="relative flex cursor-pointer flex-col items-start gap-0.5 rounded-[14px] text-left transition-colors"
                 style={{
                   padding: pkg.badge ? "18px 12px 10px" : "10px 12px",
                   border: active ? "1px solid var(--navy)" : "1px solid var(--line)",
                   background: active ? "var(--navy)" : "var(--card)",
                   color: active ? "#fff" : "var(--ink)",
+                  borderRadius: 14,
                 }}
               >
                 {pkg.badge === "most_popular" && (
