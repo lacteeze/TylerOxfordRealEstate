@@ -1,11 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
+import FeaturedCarousel from "@/components/FeaturedCarousel";
+import HeroParallax from "@/components/HeroParallax";
+import HeroSearch from "@/components/HeroSearch";
+import ListingCard from "@/components/ListingCard";
+import { landingPhotoSlot, mergeLandingPhotos } from "@/lib/landing-photos";
 import { createClient } from "@/lib/supabase/server";
 import { Listing } from "@/lib/types";
-import ListingCard from "@/components/ListingCard";
-import HeroSearch from "@/components/HeroSearch";
-import HeroParallax from "@/components/HeroParallax";
-import FeaturedCarousel from "@/components/FeaturedCarousel";
 
 export const revalidate = 60;
 
@@ -58,15 +59,19 @@ function SectionIntro({
 
 export default async function Home() {
   const supabase = await createClient();
-  const { data } = await supabase
-    .from("listings")
-    .select("*")
-    .eq("featured", true)
-    .eq("archived", false)
-    .neq("status", "sold")
-    .order("price", { ascending: false })
-    .limit(6);
+  const [{ data }, { data: photoRows, error: photoError }] = await Promise.all([
+    supabase
+      .from("listings")
+      .select("*")
+      .eq("featured", true)
+      .eq("archived", false)
+      .neq("status", "sold")
+      .order("price", { ascending: false })
+      .limit(6),
+    supabase.from("landing_photos").select("slot, url"),
+  ]);
   const featured = (data || []) as Listing[];
+  const photos = mergeLandingPhotos(photoError ? null : photoRows);
 
   const faqs: [string, string][] = [
     [
@@ -138,8 +143,8 @@ export default async function Home() {
         </div>
         <div className="mx-auto mt-8 max-w-[1140px]" style={{ padding: "0 clamp(16px,3vw,44px)" }}>
           <HeroParallax
-            src="/photos/kitchen-navy-island.png"
-            alt="Navy kitchen island with leather stools and glass pendants, shot by Tyler for Move Media"
+            src={photos.hero}
+            alt={landingPhotoSlot("hero").alt}
           />
         </div>
         {/* Floating search bar overlapping the hero edge */}
@@ -259,8 +264,8 @@ export default async function Home() {
         <div className="grid gap-5 md:grid-cols-[1.4fr_1fr_1fr]">
           <div className="relative overflow-hidden rounded-[18px]" style={{ minHeight: 260 }}>
             <Image
-              src="/photos/living-blue-velvet.png"
-              alt="Staged living room with blue velvet chairs and leather sectional, shot by Move Media"
+              src={photos.agent}
+              alt={landingPhotoSlot("agent").alt}
               fill
               sizes="(max-width: 768px) 100vw, 40vw"
               className="object-cover"
@@ -284,8 +289,8 @@ export default async function Home() {
           <div className="flex flex-col items-center justify-between gap-4 rounded-[18px] text-center" style={{ background: "var(--card)", padding: 16 }}>
             <div className="relative w-full overflow-hidden rounded-[14px]" style={{ aspectRatio: "3/2" }}>
               <Image
-                src="/photos/accepted-offer.png"
-                alt="Tyler Oxford in front of a sold home — accepted offer social graphic"
+                src={photos.selling}
+                alt={landingPhotoSlot("selling").alt}
                 fill
                 sizes="(max-width: 768px) 100vw, 25vw"
                 className="object-cover"
@@ -322,8 +327,8 @@ export default async function Home() {
           <div className="grid gap-5 rounded-[18px] sm:grid-cols-[220px_1fr]" style={{ background: "var(--card)", padding: 18 }}>
             <div className="relative overflow-hidden rounded-[14px]" style={{ minHeight: 200 }}>
               <Image
-                src="/photos/media-room-navy.png"
-                alt="Navy media room with panelled accent wall, shot by Move Media"
+                src={photos.studio}
+                alt={landingPhotoSlot("studio").alt}
                 fill
                 sizes="(max-width: 640px) 100vw, 220px"
                 className="object-cover"
@@ -395,8 +400,8 @@ export default async function Home() {
         <div className="grid items-start gap-10 md:grid-cols-2">
           <div className="relative overflow-hidden rounded-[18px]" style={{ minHeight: 300, aspectRatio: "4/3" }}>
             <Image
-              src="/photos/kitchen-white-quartz.png"
-              alt="Bright white kitchen with waterfall quartz island, shot by Move Media"
+              src={photos.about}
+              alt={landingPhotoSlot("about").alt}
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover"
@@ -464,8 +469,8 @@ export default async function Home() {
             </p>
             <div className="relative mt-2 hidden overflow-hidden rounded-[18px] md:block" style={{ height: 260, maxWidth: 320 }}>
               <Image
-                src="/photos/sunroom-red-chairs.png"
-                alt="Sunroom with red womb chairs, shot by Move Media"
+                src={photos.faq}
+                alt={landingPhotoSlot("faq").alt}
                 fill
                 sizes="320px"
                 className="object-cover"
@@ -504,8 +509,8 @@ export default async function Home() {
       <div style={{ padding: sectionPad, paddingTop: 0 }}>
         <div className="relative overflow-hidden rounded-[24px]" style={{ minHeight: 320 }}>
           <Image
-            src="/photos/living-leather-sofas.png"
-            alt="Living room with leather sofas and ocean art, shot by Move Media"
+            src={photos.cta}
+            alt={landingPhotoSlot("cta").alt}
             fill
             sizes="(max-width: 1560px) 100vw, 1560px"
             className="object-cover"

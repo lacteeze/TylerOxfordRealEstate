@@ -58,10 +58,11 @@ export default function HeroParallax({ src, alt }: { src: string; alt: string })
       >
         <div className="hero-media absolute inset-0">
           <Image
+            key={src}
             src={src}
             alt={alt}
             fill
-            priority
+            preload
             quality={95}
             sizes="100vw"
             className="object-cover"

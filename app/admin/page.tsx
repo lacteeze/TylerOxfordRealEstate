@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
+import AdminManager from "@/components/AdminManager";
+import { mergeLandingPhotos } from "@/lib/landing-photos";
 import { createClient } from "@/lib/supabase/server";
 import { Listing } from "@/lib/types";
-import AdminManager from "@/components/AdminManager";
 
 export const dynamic = "force-dynamic";
 
@@ -19,10 +20,15 @@ export default async function AdminPage() {
     redirect("/admin/login");
   }
 
-  const { data } = await supabase
-    .from("listings")
-    .select("*")
-    .order("created_at", { ascending: false });
+  const [{ data }, { data: photoRows, error: photoError }] = await Promise.all([
+    supabase.from("listings").select("*").order("created_at", { ascending: false }),
+    supabase.from("landing_photos").select("slot, url"),
+  ]);
 
-  return <AdminManager initialListings={(data || []) as Listing[]} />;
+  return (
+    <AdminManager
+      initialListings={(data || []) as Listing[]}
+      initialLandingPhotos={mergeLandingPhotos(photoError ? null : photoRows)}
+    />
+  );
 }

@@ -4,8 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import LandingPhotosManager from "@/components/LandingPhotosManager";
 import { parseDriveFolder } from "@/lib/drive-folder";
 import { createClient } from "@/lib/supabase/client";
+import type { LandingPhotoMap } from "@/lib/landing-photos";
 import { Listing, ListingStatus, chip, priceLabel } from "@/lib/types";
 
 interface FormState {
@@ -131,7 +133,13 @@ function ListingRow({
   );
 }
 
-export default function AdminManager({ initialListings }: { initialListings: Listing[] }) {
+export default function AdminManager({
+  initialListings,
+  initialLandingPhotos,
+}: {
+  initialListings: Listing[];
+  initialLandingPhotos: LandingPhotoMap;
+}) {
   const router = useRouter();
   const [listings, setListings] = useState<Listing[]>(initialListings);
   const [editing, setEditing] = useState<string | null>(null); // null | 'new' | id
@@ -421,7 +429,8 @@ export default function AdminManager({ initialListings }: { initialListings: Lis
         )}
       </div>
       <p style={{ margin: "8px 0 40px", fontSize: 13.5, color: "rgba(var(--ink-rgb),.55)", maxWidth: 560 }}>
-        Add, edit or archive properties. Archived listings leave the public site and can be restored here.
+        Add, edit or archive properties, and swap the photos used on each home-page section.
+        Archived listings leave the public site and can be restored here.
       </p>
 
       {editing === null && (
@@ -440,14 +449,14 @@ export default function AdminManager({ initialListings }: { initialListings: Lis
               />
             ))}
           </div>
-          {listings.some((l) => l.archived) && (
-            <details className="mt-10">
-              <summary
-                className="cursor-pointer select-none"
-                style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".18em", color: "rgba(var(--ink-rgb),.5)", marginBottom: 14 }}
-              >
-                ARCHIVED ({listings.filter((l) => l.archived).length})
-              </summary>
+          <details className="mt-10">
+            <summary
+              className="cursor-pointer select-none"
+              style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".18em", color: "rgba(var(--ink-rgb),.5)", marginBottom: 14 }}
+            >
+              ARCHIVED ({listings.filter((l) => l.archived).length})
+            </summary>
+            {listings.some((l) => l.archived) ? (
               <div
                 className="flex flex-col overflow-hidden rounded-xl border"
                 style={{ gap: 1, background: "rgba(var(--ink-rgb),.09)", borderColor: "rgba(var(--ink-rgb),.09)" }}
@@ -462,9 +471,14 @@ export default function AdminManager({ initialListings }: { initialListings: Lis
                   />
                 ))}
               </div>
-            </details>
-          )}
+            ) : (
+              <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink-rgb),.5)" }}>
+                No archived listings.
+              </p>
+            )}
+          </details>
           {error && <p style={{ fontSize: 13, color: "#c96a5a", marginTop: 16 }}>{error}</p>}
+          <LandingPhotosManager initialPhotos={initialLandingPhotos} />
         </>
       )}
 
