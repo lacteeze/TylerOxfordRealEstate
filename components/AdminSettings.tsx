@@ -44,19 +44,19 @@ export default function AdminSettings({
   };
 
   return (
-    <div
-      className="max-w-[1100px]"
-      style={{ padding: "clamp(44px,6vw,72px) clamp(20px,4vw,48px) clamp(64px,8vw,110px)", minHeight: "80vh" }}
-    >
-      <div className="flex items-center justify-end gap-4">
+    <div className="admin-page">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="font-serif-display m-0" style={{ fontSize: "clamp(32px,8vw,60px)", lineHeight: 1.05, fontWeight: 500 }}>
+          Settings
+        </h1>
         <Link
           href="/admin"
-          className="btn-pill cursor-pointer border no-underline transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)]"
+          className="btn-pill inline-flex min-h-11 w-full cursor-pointer items-center justify-center border no-underline transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)] sm:w-auto"
           style={{
             fontSize: 11,
             fontWeight: 600,
             letterSpacing: ".12em",
-            padding: "9px 16px",
+            padding: "10px 16px",
             color: "var(--ink)",
             borderColor: "rgba(var(--ink-rgb),.25)",
           }}
@@ -64,18 +64,15 @@ export default function AdminSettings({
           LISTINGS
         </Link>
       </div>
-      <h1 className="font-serif-display" style={{ margin: "0 0 8px", fontSize: "clamp(38px,4.5vw,60px)", lineHeight: 1, fontWeight: 500 }}>
-        Settings
-      </h1>
-      <p style={{ margin: "0 0 40px", ...fieldNote }}>
+      <p style={{ margin: "8px 0 40px", ...fieldNote }}>
         Connect Google Drive so listing photos can be imported from a shared folder.
       </p>
 
       <div
         className="flex flex-col gap-5 rounded-[14px] border"
-        style={{ borderColor: "rgba(var(--ink-rgb),.12)", background: "var(--bg2)", padding: "clamp(24px,3vw,40px)", maxWidth: 640 }}
+        style={{ borderColor: "rgba(var(--ink-rgb),.12)", background: "var(--bg2)", padding: "clamp(20px,3vw,40px)", maxWidth: 640 }}
       >
-        <span className="font-serif-display" style={{ fontSize: 26 }}>
+        <span className="font-serif-display" style={{ fontSize: "clamp(22px,6vw,26px)" }}>
           Google Drive
         </span>
         <p style={{ margin: 0, ...fieldNote }}>
@@ -86,7 +83,7 @@ export default function AdminSettings({
             : "Add Google OAuth credentials to enable Drive. Create an OAuth client in Google Cloud Console (Web application), enable the Google Drive API, and add authorized redirect URIs for local and production."}
         </p>
         {configured && !connected && (
-          <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: "rgba(var(--ink-rgb),.5)" }}>
+          <p className="break-all" style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: "rgba(var(--ink-rgb),.5)" }}>
             Redirect URI: <code>{`{origin}/api/admin/google/callback`}</code>
             <br />
             Register both <code>http://localhost:3001/api/admin/google/callback</code> and{" "}
@@ -106,13 +103,13 @@ export default function AdminSettings({
             {error}
           </span>
         )}
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           {configured ? (
             connected ? (
               <button
                 onClick={disconnect}
                 disabled={busy}
-                className="cursor-pointer border bg-transparent transition-colors hover:!border-[#c96a5a] hover:!text-[#c96a5a] disabled:opacity-60"
+                className="min-h-11 w-full cursor-pointer border bg-transparent transition-colors hover:!border-[#c96a5a] hover:!text-[#c96a5a] disabled:opacity-60 sm:w-auto"
                 style={{
                   fontSize: 12,
                   fontWeight: 600,
@@ -127,7 +124,7 @@ export default function AdminSettings({
             ) : (
               <a
                 href="/api/admin/google/connect"
-                className="btn-pill inline-block cursor-pointer border-none no-underline transition-colors hover:!bg-[var(--gold-hov)]"
+                className="btn-pill inline-flex min-h-11 w-full cursor-pointer items-center justify-center border-none no-underline transition-colors hover:!bg-[var(--gold-hov)] sm:w-auto"
                 style={{
                   fontSize: 12,
                   fontWeight: 600,

@@ -75,13 +75,10 @@ export default function AdminInquiries({ initialLeads }: { initialLeads: Lead[] 
   }
 
   return (
-    <div
-      className="max-w-[1100px]"
-      style={{ padding: "clamp(44px,6vw,72px) clamp(20px,4vw,48px) clamp(64px,8vw,110px)", minHeight: "80vh" }}
-    >
+    <div className="admin-page">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="font-serif-display m-0" style={{ fontSize: "clamp(38px,4.5vw,60px)", lineHeight: 1, fontWeight: 500 }}>
+        <div className="min-w-0">
+          <h1 className="font-serif-display m-0" style={{ fontSize: "clamp(32px,8vw,60px)", lineHeight: 1.05, fontWeight: 500 }}>
             Inquiries
           </h1>
           <p style={{ margin: "8px 0 0", fontSize: 13.5, color: "rgba(var(--ink-rgb),.55)", maxWidth: 520 }}>
@@ -93,7 +90,7 @@ export default function AdminInquiries({ initialLeads }: { initialLeads: Lead[] 
         </div>
       </div>
 
-      <div className="mb-6 mt-8 flex flex-wrap items-center gap-2.5">
+      <div className="mb-6 mt-8 flex flex-wrap items-center gap-2">
         {(
           [
             ["all", `All (${initialLeads.length})`],
@@ -107,7 +104,7 @@ export default function AdminInquiries({ initialLeads }: { initialLeads: Lead[] 
               key={key}
               type="button"
               onClick={() => setFilter(key)}
-              className="transition-colors"
+              className="min-h-11 transition-colors"
               style={{
                 ...pillBase,
                 background: on ? "var(--ink)" : "var(--card)",
@@ -134,21 +131,21 @@ export default function AdminInquiries({ initialLeads }: { initialLeads: Lead[] 
               key={lead.id}
               type="button"
               onClick={() => setSelectedId(lead.id)}
-              className="flex flex-wrap items-center text-left cursor-pointer border-none transition-colors hover:!bg-[var(--bg2)]"
-              style={{ gap: "10px 20px", background: "var(--bg)", padding: "16px 18px", color: "var(--ink)" }}
+              className="flex min-h-11 cursor-pointer flex-col items-stretch gap-3 border-none p-4 text-left transition-colors hover:!bg-[var(--bg2)] sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5 sm:gap-y-2 sm:px-[18px] sm:py-4"
+              style={{ background: "var(--bg)", color: "var(--ink)" }}
             >
               <div className="flex min-w-0 flex-1 flex-col gap-[4px]">
-                <span className="font-serif-display" style={{ fontSize: 19 }}>
+                <span className="font-serif-display break-words" style={{ fontSize: 19 }}>
                   {lead.name}
                 </span>
-                <span style={{ fontSize: 12, color: "rgba(var(--ink-rgb),.55)" }}>{contactLine(lead)}</span>
+                <span className="break-words" style={{ fontSize: 12, color: "rgba(var(--ink-rgb),.55)" }}>{contactLine(lead)}</span>
               </div>
-              <div className="flex flex-col gap-1" style={{ minWidth: 160 }}>
+              <div className="flex min-w-0 flex-col gap-1 sm:max-w-[220px]">
                 <span style={{ fontSize: 11.5, fontWeight: 600, letterSpacing: ".08em", color: "rgba(var(--ink-rgb),.6)" }}>
                   {kindLabel(lead.kind)}
                   {lead.intent ? ` · ${lead.intent === "buying" ? "Buying" : "Selling"}` : ""}
                 </span>
-                <span style={{ fontSize: 12, color: "rgba(var(--ink-rgb),.5)" }}>
+                <span className="break-words" style={{ fontSize: 12, color: "rgba(var(--ink-rgb),.5)" }}>
                   {lead.kind === "media"
                     ? [serviceNames(lead), lead.quote_cents != null ? formatCad(lead.quote_cents) : null]
                         .filter(Boolean)
@@ -156,8 +153,8 @@ export default function AdminInquiries({ initialLeads }: { initialLeads: Lead[] 
                     : formatPropertyPrefs(lead.property_prefs) || "Inquiry"}
                 </span>
               </div>
-              <div className="flex flex-col items-end gap-1" style={{ minWidth: 140 }}>
-                <span style={{ fontSize: 12, color: "rgba(var(--ink-rgb),.55)" }}>
+              <div className="flex min-w-0 flex-col items-start gap-1 sm:ml-auto sm:items-end">
+                <span className="break-words" style={{ fontSize: 12, color: "rgba(var(--ink-rgb),.55)" }}>
                   {lead.service_address || lead.property_prefs?.address || "—"}
                 </span>
                 <span style={{ fontSize: 11.5, color: "rgba(var(--ink-rgb),.45)" }}>{formatWhen(lead.created_at)}</span>
@@ -210,35 +207,32 @@ function InquiryDetail({
   const items = lead.quote_line_items || [];
 
   return (
-    <div
-      className="max-w-[1100px]"
-      style={{ padding: "clamp(44px,6vw,72px) clamp(20px,4vw,48px) clamp(64px,8vw,110px)", minHeight: "80vh" }}
-    >
-      <div className="flex flex-wrap items-center justify-between gap-3" style={{ marginBottom: 18 }}>
-        <h1 className="font-serif-display m-0" style={{ fontSize: "clamp(32px,4vw,48px)", lineHeight: 1.05, fontWeight: 500 }}>
+    <div className="admin-page">
+      <div className="mb-[18px] flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="font-serif-display m-0 min-w-0 break-words" style={{ fontSize: "clamp(28px,7vw,48px)", lineHeight: 1.1, fontWeight: 500 }}>
           {lead.name}
         </h1>
         <button
           type="button"
           onClick={onBack}
-          className="flex-none cursor-pointer border bg-transparent transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)]"
-          style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".12em", padding: "9px 16px", color: "var(--ink)", borderColor: "rgba(var(--ink-rgb),.25)" }}
+          className="min-h-11 w-full flex-none cursor-pointer border bg-transparent transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)] sm:w-auto"
+          style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".12em", padding: "10px 16px", color: "var(--ink)", borderColor: "rgba(var(--ink-rgb),.25)" }}
         >
           ← INQUIRIES
         </button>
       </div>
-      <div className="mb-7 flex flex-wrap items-center gap-2">
+      <div className="mb-7 flex items-center gap-2">
         <button
           type="button"
           onClick={onPrev}
           disabled={!onPrev}
           aria-label="Previous inquiry"
-          className="cursor-pointer border bg-transparent transition-colors hover:enabled:!border-[var(--gold)] hover:enabled:!text-[var(--gold)] disabled:cursor-default disabled:opacity-35"
-          style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".12em", padding: "9px 16px", color: "var(--ink)", borderColor: "rgba(var(--ink-rgb),.25)" }}
+          className="min-h-11 min-w-11 flex-1 cursor-pointer border bg-transparent transition-colors hover:enabled:!border-[var(--gold)] hover:enabled:!text-[var(--gold)] disabled:cursor-default disabled:opacity-35 sm:flex-none"
+          style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".08em", padding: "10px 12px", color: "var(--ink)", borderColor: "rgba(var(--ink-rgb),.25)" }}
         >
-          ← PREVIOUS
+          ← PREV
         </button>
-        <span style={{ fontSize: 12, color: "rgba(var(--ink-rgb),.5)", padding: "0 6px" }}>
+        <span className="flex-none whitespace-nowrap" style={{ fontSize: 12, color: "rgba(var(--ink-rgb),.5)", padding: "0 4px" }}>
           {index + 1} of {total}
         </span>
         <button
@@ -246,16 +240,16 @@ function InquiryDetail({
           onClick={onNext}
           disabled={!onNext}
           aria-label="Next inquiry"
-          className="cursor-pointer border bg-transparent transition-colors hover:enabled:!border-[var(--gold)] hover:enabled:!text-[var(--gold)] disabled:cursor-default disabled:opacity-35"
-          style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".12em", padding: "9px 16px", color: "var(--ink)", borderColor: "rgba(var(--ink-rgb),.25)" }}
+          className="min-h-11 min-w-11 flex-1 cursor-pointer border bg-transparent transition-colors hover:enabled:!border-[var(--gold)] hover:enabled:!text-[var(--gold)] disabled:cursor-default disabled:opacity-35 sm:flex-none"
+          style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".08em", padding: "10px 12px", color: "var(--ink)", borderColor: "rgba(var(--ink-rgb),.25)" }}
         >
           NEXT →
         </button>
       </div>
 
       <div
-        className="flex flex-col gap-6 rounded-[14px] border"
-        style={{ borderColor: "rgba(var(--ink-rgb),.12)", background: "var(--bg2)", padding: "clamp(24px,3vw,40px)" }}
+        className="flex min-w-0 flex-col gap-6 rounded-[14px] border"
+        style={{ borderColor: "rgba(var(--ink-rgb),.12)", background: "var(--bg2)", padding: "clamp(20px,3vw,40px)" }}
       >
         <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,200px),1fr))", gap: "18px 24px" }}>
           <DetailField label="KIND" value={kindLabel(lead.kind)} />
@@ -278,7 +272,8 @@ function InquiryDetail({
         {items.length > 0 && (
           <div>
             <span style={labelStyle}>QUOTE</span>
-            <table className="mt-2 w-full max-w-[480px]" style={{ borderCollapse: "collapse", fontSize: 14 }}>
+            <div className="mt-2 max-w-[480px] overflow-x-auto">
+            <table className="w-full" style={{ borderCollapse: "collapse", fontSize: 14 }}>
               <tbody>
                 {items.map((item, i) => (
                   <tr key={`${item.id || item.name}-${i}`}>
@@ -298,6 +293,7 @@ function InquiryDetail({
                 )}
               </tbody>
             </table>
+            </div>
           </div>
         )}
 
@@ -324,14 +320,16 @@ function DetailField({
   href?: string;
 }) {
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex min-w-0 flex-col gap-1">
       <span style={labelStyle}>{label}</span>
       {href ? (
-        <a href={href} className="no-underline" style={{ fontSize: 14.5, color: "var(--ink)" }}>
+        <a href={href} className="break-words no-underline" style={{ fontSize: 14.5, color: "var(--ink)" }}>
           {value}
         </a>
       ) : (
-        <span style={{ fontSize: 14.5, color: "var(--ink)" }}>{value}</span>
+        <span className="break-words" style={{ fontSize: 14.5, color: "var(--ink)" }}>
+          {value}
+        </span>
       )}
     </div>
   );

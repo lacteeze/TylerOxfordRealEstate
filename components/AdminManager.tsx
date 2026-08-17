@@ -97,28 +97,30 @@ function ListingRow({
           onOpen();
         }
       }}
-      className="flex flex-wrap items-center cursor-pointer transition-colors hover:!bg-[var(--bg2)]"
-      style={{ gap: "12px 20px", background: "var(--bg)", padding: "14px 18px" }}
+      className="flex cursor-pointer flex-col gap-3 p-4 transition-colors hover:!bg-[var(--bg2)] sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5 sm:gap-y-3 sm:px-[18px] sm:py-[14px]"
+      style={{ background: "var(--bg)" }}
     >
-      {listing.photos?.[0] ? (
-        <Image
-          src={listing.photos[0]}
-          alt=""
-          width={86}
-          height={60}
-          className="flex-none rounded-md object-cover"
-          style={{ background: "var(--surface)" }}
-        />
-      ) : (
-        <span className="block flex-none rounded-md" style={{ width: 86, height: 60, background: "var(--surface)" }} />
-      )}
-      <div className="flex min-w-0 flex-1 flex-col gap-[3px]">
-        <span className="font-serif-display" style={{ fontSize: 19 }}>
-          {listing.title}
-        </span>
-        <span style={{ fontSize: 11.5, color: "rgba(var(--ink-rgb),.5)", letterSpacing: ".04em" }}>
-          {listing.published ? "Public" : "Private"} · {c.label} · {priceLabel(listing)} · {(listing.photos || []).length} photos
-        </span>
+      <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-5">
+        {listing.photos?.[0] ? (
+          <Image
+            src={listing.photos[0]}
+            alt=""
+            width={86}
+            height={60}
+            className="flex-none rounded-md object-cover"
+            style={{ background: "var(--surface)" }}
+          />
+        ) : (
+          <span className="block flex-none rounded-md" style={{ width: 86, height: 60, background: "var(--surface)" }} />
+        )}
+        <div className="flex min-w-0 flex-1 flex-col gap-[3px]">
+          <span className="font-serif-display break-words" style={{ fontSize: 19 }}>
+            {listing.title}
+          </span>
+          <span style={{ fontSize: 11.5, color: "rgba(var(--ink-rgb),.5)", letterSpacing: ".04em" }}>
+            {listing.published ? "Public" : "Private"} · {c.label} · {priceLabel(listing)} · {(listing.photos || []).length} photos
+          </span>
+        </div>
       </div>
       <button
         type="button"
@@ -126,8 +128,8 @@ function ListingRow({
           e.stopPropagation();
           onAction();
         }}
-        className="cursor-pointer border bg-transparent transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)]"
-        style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".12em", padding: "9px 16px", color: "rgba(var(--ink-rgb),.4)", borderColor: "rgba(var(--ink-rgb),.12)" }}
+        className="min-h-11 w-full cursor-pointer border bg-transparent transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)] sm:w-auto sm:flex-none"
+        style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".12em", padding: "10px 16px", color: "rgba(var(--ink-rgb),.4)", borderColor: "rgba(var(--ink-rgb),.12)" }}
       >
         {actionLabel}
       </button>
@@ -409,12 +411,9 @@ export default function AdminManager({
   }
 
   return (
-    <div
-      className="max-w-[1100px]"
-      style={{ padding: "clamp(44px,6vw,72px) clamp(20px,4vw,48px) clamp(64px,8vw,110px)", minHeight: "80vh" }}
-    >
-      <div className="flex items-center justify-between gap-4">
-        <h1 className="font-serif-display m-0" style={{ fontSize: "clamp(38px,4.5vw,60px)", lineHeight: 1, fontWeight: 500 }}>
+    <div className="admin-page">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="font-serif-display m-0" style={{ fontSize: "clamp(32px,8vw,60px)", lineHeight: 1.05, fontWeight: 500 }}>
           Manage listings
         </h1>
         {editing === null && (
@@ -425,7 +424,7 @@ export default function AdminManager({
               setError("");
               setDriveImport("");
             }}
-            className="flex-none cursor-pointer border-none transition-colors hover:!bg-[var(--gold-hov)]"
+            className="min-h-11 w-full flex-none cursor-pointer border-none transition-colors hover:!bg-[var(--gold-hov)] sm:w-auto"
             style={{ fontSize: 12, fontWeight: 600, letterSpacing: ".08em", padding: "14px 24px", background: "var(--gold)", color: "var(--gold-ink)" }}
           >
             ＋ NEW LISTING
@@ -457,7 +456,7 @@ export default function AdminManager({
           </div>
           <details className="mt-10">
             <summary
-              className="cursor-pointer select-none"
+              className="flex min-h-11 cursor-pointer select-none items-center"
               style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".18em", color: "rgba(var(--ink-rgb),.5)", marginBottom: 14 }}
             >
               ARCHIVED ({listings.filter((l) => l.archived).length})
@@ -490,18 +489,18 @@ export default function AdminManager({
 
       {editing !== null && (
         <div
-          className="flex flex-col gap-6 rounded-[14px] border"
-          style={{ borderColor: "rgba(var(--ink-rgb),.12)", background: "var(--bg2)", padding: "clamp(24px,3vw,40px)" }}
+          className="flex min-w-0 flex-col gap-6 rounded-[14px] border"
+          style={{ borderColor: "rgba(var(--ink-rgb),.12)", background: "var(--bg2)", padding: "clamp(20px,3vw,40px)" }}
         >
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <span className="font-serif-display" style={{ fontSize: 26 }}>
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+            <span className="font-serif-display break-words" style={{ fontSize: "clamp(22px,6vw,26px)" }}>
               {editing === "new" ? "New listing" : `Edit — ${form.title || "listing"}`}
             </span>
             <button
               type="button"
               onClick={closeEditor}
-              className="flex-none cursor-pointer border bg-transparent transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)]"
-              style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".12em", padding: "9px 16px", color: "var(--ink)", borderColor: "rgba(var(--ink-rgb),.25)" }}
+              className="min-h-11 w-full flex-none cursor-pointer border bg-transparent transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)] sm:w-auto"
+              style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".12em", padding: "10px 16px", color: "var(--ink)", borderColor: "rgba(var(--ink-rgb),.25)" }}
             >
               ← LISTINGS
             </button>
@@ -546,7 +545,7 @@ export default function AdminManager({
                       key={label}
                       type="button"
                       onClick={() => setForm({ ...form, published: value, featured: value ? form.featured : false })}
-                      className="cursor-pointer rounded-full border-none transition-colors"
+                      className="min-h-11 cursor-pointer rounded-full border-none transition-colors"
                       style={{
                         fontSize: 12.5,
                         fontWeight: 500,
@@ -564,7 +563,7 @@ export default function AdminManager({
                 Private listings stay off the public site. New listings start private.
               </span>
             </div>
-            <div className="grid grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-5">
               <label className="flex flex-col gap-1.5">
                 <span style={labelStyle}>BEDS</span>
                 <input type="number" value={form.beds} onChange={(e) => setForm({ ...form, beds: e.target.value })} style={fieldStyle} />
@@ -578,13 +577,14 @@ export default function AdminManager({
                 <input type="number" value={form.sqft} onChange={(e) => setForm({ ...form, sqft: e.target.value })} style={fieldStyle} />
               </label>
             </div>
-            <label className="flex cursor-pointer items-center gap-2.5 self-end pb-3" style={{ opacity: form.published ? 1 : 0.5 }}>
+            <label className="flex min-h-11 cursor-pointer items-center gap-2.5 self-start sm:self-end sm:pb-3" style={{ opacity: form.published ? 1 : 0.5 }}>
               <input
                 type="checkbox"
                 checked={form.published && form.featured}
                 disabled={!form.published}
                 onChange={(e) => setForm({ ...form, featured: e.target.checked })}
-                style={{ accentColor: "var(--gold)", width: 16, height: 16 }}
+                className="h-[18px] w-[18px] shrink-0"
+                style={{ accentColor: "var(--gold)" }}
               />
               <span style={{ fontSize: 12.5, color: "rgba(var(--ink-rgb),.75)" }}>
                 Feature on the home page{form.published ? "" : " (public listings only)"}
@@ -607,7 +607,7 @@ export default function AdminManager({
               <span style={labelStyle}>VIDEO / DRONE TOUR LINK</span>
               <input value={form.video_url} onChange={(e) => setForm({ ...form, video_url: e.target.value })} placeholder="https://youtube.com/…" style={fieldStyle} />
             </label>
-            <div className="grid grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
               <label className="flex flex-col gap-1.5">
                 <span style={labelStyle}>MAP LAT</span>
                 <input type="number" step="0.0001" value={form.lat} onChange={(e) => setForm({ ...form, lat: e.target.value })} style={fieldStyle} />
@@ -631,7 +631,7 @@ export default function AdminManager({
                     type="button"
                     onClick={importFromDrive}
                     disabled={uploading}
-                    className="cursor-pointer whitespace-nowrap border bg-transparent transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)] disabled:opacity-60"
+                    className="min-h-11 w-full cursor-pointer whitespace-nowrap border bg-transparent transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)] disabled:opacity-60 sm:w-auto"
                     style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".12em", padding: "12px 16px", color: "var(--ink)", borderColor: "rgba(var(--ink-rgb),.25)" }}
                   >
                     IMPORT FROM DRIVE
@@ -639,7 +639,7 @@ export default function AdminManager({
                 ) : (
                   <Link
                     href="/admin/settings"
-                    className="whitespace-nowrap no-underline"
+                    className="min-h-11 inline-flex items-center no-underline"
                     style={{ fontSize: 12, color: "var(--navy)", fontWeight: 600 }}
                   >
                     Connect Google Drive in Settings
@@ -668,7 +668,7 @@ export default function AdminManager({
               {form.photos.map((src, i) => (
                 <div
                   key={src + i}
-                  className="relative cursor-grab"
+                  className="relative w-[calc(50%-6px)] cursor-grab sm:w-[150px]"
                   draggable
                   onDragStart={(e) => {
                     e.dataTransfer.setData("text/photo-index", String(i));
@@ -684,17 +684,13 @@ export default function AdminManager({
                     const from = Number(e.dataTransfer.getData("text/photo-index"));
                     if (!Number.isNaN(from)) reorderPhotos(from, i);
                   }}
-                  style={{ width: 150 }}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={src}
                     alt=""
+                    className="block h-[104px] w-full object-cover sm:w-[150px]"
                     style={{
-                      width: 150,
-                      height: 104,
-                      objectFit: "cover",
-                      display: "block",
                       border: "1px solid rgba(var(--ink-rgb),.15)",
                       borderRadius: 8,
                       boxSizing: "border-box",
@@ -703,10 +699,10 @@ export default function AdminManager({
                   <button
                     onClick={() => setForm((f) => ({ ...f, photos: f.photos.filter((_, j) => j !== i) }))}
                     title="Remove photo"
-                    className="absolute right-1.5 top-1.5 cursor-pointer"
+                    className="absolute right-1.5 top-1.5 flex cursor-pointer items-center justify-center"
                     style={{
-                      width: 24,
-                      height: 24,
+                      width: 36,
+                      height: 36,
                       background: "rgba(16,18,22,.85)",
                       color: "#f1eee8",
                       border: "1px solid rgba(241,238,232,.3)",
@@ -727,10 +723,8 @@ export default function AdminManager({
                 </div>
               ))}
               <label
-                className="btn-pill flex cursor-pointer flex-col items-center justify-center gap-1.5 transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)]"
+                className="btn-pill flex h-[104px] w-[calc(50%-6px)] cursor-pointer flex-col items-center justify-center gap-1.5 transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)] sm:w-[150px]"
                 style={{
-                  width: dropActive ? 220 : 150,
-                  height: 104,
                   border: dropActive ? "1px dashed var(--navy)" : "1px dashed rgba(var(--ink-rgb),.3)",
                   color: dropActive ? "var(--navy)" : "rgba(var(--ink-rgb),.6)",
                   background: dropActive ? "rgba(29,46,73,.04)" : "transparent",
@@ -755,18 +749,18 @@ export default function AdminManager({
           </div>
 
           {error && <span style={{ fontSize: 13, color: "#c96a5a" }}>{error}</span>}
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <button
               onClick={save}
               disabled={busy || uploading}
-              className="cursor-pointer border-none transition-colors hover:!bg-[var(--gold-hov)] disabled:opacity-60"
+              className="min-h-11 w-full cursor-pointer border-none transition-colors hover:!bg-[var(--gold-hov)] disabled:opacity-60 sm:w-auto"
               style={{ fontSize: 12, fontWeight: 600, letterSpacing: ".08em", padding: "14px 26px", background: "var(--gold)", color: "var(--gold-ink)" }}
             >
               {busy ? "SAVING…" : "SAVE LISTING"}
             </button>
             <button
               onClick={closeEditor}
-              className="cursor-pointer border bg-transparent transition-colors hover:!border-[var(--ink)] hover:!text-[var(--ink)]"
+              className="min-h-11 w-full cursor-pointer border bg-transparent transition-colors hover:!border-[var(--ink)] hover:!text-[var(--ink)] sm:w-auto"
               style={{ fontSize: 12, fontWeight: 600, letterSpacing: ".08em", padding: "14px 26px", color: "rgba(var(--ink-rgb),.7)", borderColor: "rgba(var(--ink-rgb),.25)" }}
             >
               CANCEL

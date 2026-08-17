@@ -48,7 +48,7 @@ export default function Header() {
     >
       <div
         className="flex items-center justify-between"
-        style={{ padding: "16px clamp(20px,3.5vw,44px)" }}
+        style={{ padding: "14px clamp(16px,3.5vw,44px)" }}
       >
         <Link href="/" className="flex items-baseline gap-2 no-underline" style={{ color: "var(--ink)" }}>
           <span className="font-display" style={{ fontSize: 21, fontWeight: 700, letterSpacing: "-.01em" }}>
@@ -97,7 +97,7 @@ export default function Header() {
 
       {/* Dropdown menu panel */}
       {open && (
-        <div className="fade-up" style={{ padding: "0 clamp(20px,3.5vw,44px) 22px" }}>
+        <div className="fade-up" style={{ padding: "0 clamp(16px,3.5vw,44px) 20px" }}>
           <div
             className="mx-auto flex flex-col gap-1 rounded-[18px] md:flex-row md:items-center md:justify-between"
             style={{ background: "var(--bg)", border: "1px solid var(--line)", padding: "18px clamp(18px,2.5vw,28px)" }}
@@ -108,7 +108,7 @@ export default function Header() {
                   key={label}
                   href={href}
                   onClick={() => setOpen(false)}
-                  className="no-underline transition-colors hover:!text-[var(--gold)]"
+                  className="flex min-h-11 items-center no-underline transition-colors hover:!text-[var(--gold)]"
                   style={{
                     color:
                       (href === "/admin" ? pathname === "/admin" : pathname.startsWith(href)) ||
@@ -128,28 +128,28 @@ export default function Header() {
                 </Link>
               ))}
             </nav>
-            <div className="mt-3 flex flex-col gap-2.5 sm:flex-row md:mt-0">
+            <div className="mt-3 flex flex-col gap-2.5 md:mt-0 md:flex-row md:flex-wrap">
               {isAdmin ? (
                 <>
-                  <Link href="/admin/inquiries" onClick={() => setOpen(false)} className="pill-navy justify-center">
+                  <Link href="/admin/inquiries" onClick={() => setOpen(false)} className="pill-navy min-h-11 w-full justify-center md:w-auto">
                     Inquiries <span className="pill-arrow">↗</span>
                   </Link>
-                  <Link href="/admin/settings" onClick={() => setOpen(false)} className="pill-outline justify-center">
+                  <Link href="/admin/settings" onClick={() => setOpen(false)} className="pill-outline min-h-11 w-full justify-center md:w-auto">
                     Settings
                   </Link>
-                  <Link href="/" onClick={() => setOpen(false)} className="pill-outline justify-center">
+                  <Link href="/" onClick={() => setOpen(false)} className="pill-outline min-h-11 w-full justify-center md:w-auto">
                     View site <span className="pill-arrow">↗</span>
                   </Link>
-                  <button type="button" onClick={signOut} className="pill-outline justify-center">
+                  <button type="button" onClick={signOut} className="pill-outline min-h-11 w-full justify-center md:w-auto">
                     Sign out
                   </button>
                 </>
               ) : (
                 <>
-                  <Link href="/#contact" onClick={() => setOpen(false)} className="pill-navy justify-center">
+                  <Link href="/#contact" onClick={() => setOpen(false)} className="pill-navy min-h-11 w-full justify-center sm:w-auto">
                     Work with Tyler <span className="pill-arrow">↗</span>
                   </Link>
-                  <Link href="/#contact" onClick={() => setOpen(false)} className="pill-outline justify-center">
+                  <Link href="/#contact" onClick={() => setOpen(false)} className="pill-outline min-h-11 w-full justify-center sm:w-auto">
                     Book the studio <span className="pill-arrow">↗</span>
                   </Link>
                 </>

@@ -23,7 +23,7 @@ const ghostBtn: React.CSSProperties = {
   fontSize: 11,
   fontWeight: 600,
   letterSpacing: ".12em",
-  padding: "9px 16px",
+  padding: "10px 16px",
   color: "var(--ink)",
   borderColor: "rgba(var(--ink-rgb),.25)",
 };
@@ -177,12 +177,12 @@ export default function LandingPhotosManager({
                     {slot.description}
                   </p>
                 </div>
-                <div className="mt-auto flex flex-wrap gap-2">
+                <div className="mt-auto flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                   <button
                     type="button"
                     disabled={busy}
                     onClick={() => fileInputs.current[slot.id]?.click()}
-                    className="cursor-pointer border bg-transparent transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)] disabled:opacity-60"
+                    className="min-h-11 w-full cursor-pointer border bg-transparent transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)] disabled:opacity-60 sm:w-auto"
                     style={ghostBtn}
                   >
                     UPLOAD
@@ -191,7 +191,7 @@ export default function LandingPhotosManager({
                     type="button"
                     disabled={busy}
                     onClick={() => setLibraryFor((current) => (current === slot.id ? null : slot.id))}
-                    className="cursor-pointer border bg-transparent transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)] disabled:opacity-60"
+                    className="min-h-11 w-full cursor-pointer border bg-transparent transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)] disabled:opacity-60 sm:w-auto"
                     style={ghostBtn}
                   >
                     {libraryFor === slot.id ? "CLOSE LIBRARY" : "SITE PHOTOS"}
@@ -201,7 +201,7 @@ export default function LandingPhotosManager({
                       type="button"
                       disabled={busy}
                       onClick={() => resetSlot(slot.id)}
-                      className="cursor-pointer border bg-transparent transition-colors hover:!border-[#c96a5a] hover:!text-[#c96a5a] disabled:opacity-60"
+                      className="min-h-11 w-full cursor-pointer border bg-transparent transition-colors hover:!border-[#c96a5a] hover:!text-[#c96a5a] disabled:opacity-60 sm:w-auto"
                       style={{ ...ghostBtn, color: "rgba(var(--ink-rgb),.7)" }}
                     >
                       RESET

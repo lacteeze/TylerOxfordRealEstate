@@ -15,6 +15,8 @@ const fieldStyle: React.CSSProperties = {
   borderRadius: 8,
   padding: "12px 14px",
   fontSize: 14,
+  width: "100%",
+  boxSizing: "border-box",
 };
 
 const labelStyle: React.CSSProperties = {
@@ -44,14 +46,14 @@ export default function AdminLoginForm({ linkError }: { linkError?: boolean }) {
       : null);
 
   return (
-    <div className="flex min-h-[70vh] items-center justify-center" style={{ padding: "clamp(44px,6vw,72px) clamp(20px,4vw,48px)" }}>
+    <div className="flex min-h-[70vh] items-center justify-center" style={{ padding: "clamp(28px,6vw,72px) clamp(16px,4vw,48px)" }}>
       <form
         action={forgot ? linkAction : signInAction}
-        className="flex w-full max-w-[420px] flex-col gap-5 rounded-[14px] border"
-        style={{ background: "var(--bg2)", borderColor: "rgba(var(--ink-rgb),.12)", padding: "clamp(28px,4vw,44px)" }}
+        className="flex w-full min-w-0 max-w-[420px] flex-col gap-5 rounded-[14px] border"
+        style={{ background: "var(--bg2)", borderColor: "rgba(var(--ink-rgb),.12)", padding: "clamp(24px,4vw,44px)" }}
       >
         <div>
-          <h1 className="font-serif-display m-0" style={{ fontSize: 34, fontWeight: 500 }}>
+          <h1 className="font-serif-display m-0" style={{ fontSize: "clamp(28px,8vw,34px)", fontWeight: 500 }}>
             {forgot ? "Forgot password" : "Sign in"}
           </h1>
           {forgot && (
@@ -83,8 +85,8 @@ export default function AdminLoginForm({ linkError }: { linkError?: boolean }) {
           </label>
         )}
         {!forgot && (
-          <label className="flex items-center gap-2.5" style={{ fontSize: 13.5, color: "var(--ink)" }}>
-            <input type="checkbox" name="remember" value="1" defaultChecked />
+          <label className="flex min-h-11 items-center gap-3" style={{ fontSize: 15, color: "var(--ink)" }}>
+            <input type="checkbox" name="remember" value="1" defaultChecked className="h-[18px] w-[18px] shrink-0" />
             Remember me
           </label>
         )}
@@ -105,7 +107,7 @@ export default function AdminLoginForm({ linkError }: { linkError?: boolean }) {
               name="intent"
               value="magic"
               disabled={sendingLink}
-              className="cursor-pointer border-none transition-colors hover:!bg-[var(--gold-hov)] disabled:opacity-60"
+              className="min-h-11 w-full cursor-pointer border-none transition-colors hover:!bg-[var(--gold-hov)] disabled:opacity-60"
               style={{ fontSize: 12, fontWeight: 600, letterSpacing: ".08em", padding: "14px 26px", background: "var(--gold)", color: "var(--gold-ink)" }}
             >
               {sendingLink ? "SENDING…" : "EMAIL SIGN-IN LINK"}
@@ -115,7 +117,7 @@ export default function AdminLoginForm({ linkError }: { linkError?: boolean }) {
               name="intent"
               value="recovery"
               disabled={sendingLink}
-              className="cursor-pointer border bg-transparent transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)] disabled:opacity-60"
+              className="min-h-11 w-full cursor-pointer border bg-transparent transition-colors hover:!border-[var(--gold)] hover:!text-[var(--gold)] disabled:opacity-60"
               style={{ fontSize: 12, fontWeight: 600, letterSpacing: ".08em", padding: "14px 26px", color: "var(--ink)", borderColor: "rgba(var(--ink-rgb),.25)" }}
             >
               EMAIL PASSWORD RESET
@@ -123,7 +125,7 @@ export default function AdminLoginForm({ linkError }: { linkError?: boolean }) {
             <button
               type="button"
               onClick={() => setForgot(false)}
-              className="cursor-pointer border-none bg-transparent"
+              className="min-h-11 cursor-pointer border-none bg-transparent"
               style={{ fontSize: 13, color: "rgba(var(--ink-rgb),.6)", padding: "4px 0", textAlign: "left" }}
             >
               ← Back to sign in
@@ -134,7 +136,7 @@ export default function AdminLoginForm({ linkError }: { linkError?: boolean }) {
             <button
               type="submit"
               disabled={signingIn}
-              className="cursor-pointer border-none transition-colors hover:!bg-[var(--gold-hov)] disabled:opacity-60"
+              className="min-h-11 w-full cursor-pointer border-none transition-colors hover:!bg-[var(--gold-hov)] disabled:opacity-60"
               style={{ fontSize: 12, fontWeight: 600, letterSpacing: ".08em", padding: "14px 26px", background: "var(--gold)", color: "var(--gold-ink)" }}
             >
               {signingIn ? "SIGNING IN…" : "SIGN IN"}
@@ -142,7 +144,7 @@ export default function AdminLoginForm({ linkError }: { linkError?: boolean }) {
             <button
               type="button"
               onClick={() => setForgot(true)}
-              className="cursor-pointer border-none bg-transparent"
+              className="min-h-11 cursor-pointer border-none bg-transparent"
               style={{ fontSize: 13, color: "rgba(var(--ink-rgb),.6)", padding: 0, textAlign: "left" }}
             >
               Forgot password?
