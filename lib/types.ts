@@ -1,4 +1,4 @@
-export type ListingStatus = "sale" | "lease" | "sold";
+export type ListingStatus = "sale" | "lease" | "sold" | "showcase";
 
 export type { ServiceId } from "./pricing";
 export type { InquiryIntent, PropertyPrefs } from "./inquiry";
@@ -13,6 +13,7 @@ export interface Listing {
   baths: number;
   sqft: number;
   featured: boolean;
+  published: boolean;
   lat: number | null;
   lng: number | null;
   video_url: string;
@@ -26,10 +27,38 @@ export interface Listing {
   updated_at?: string;
 }
 
+export interface LeadLineItem {
+  kind?: string;
+  id?: string;
+  name: string;
+  priceCents: number;
+}
+
+export interface Lead {
+  id: string;
+  kind: "real_estate" | "media";
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  listing_id: string | null;
+  services: string[] | null;
+  quote_cents: number | null;
+  quote_line_items: LeadLineItem[] | null;
+  intent: "buying" | "selling" | null;
+  property_prefs: import("./inquiry").PropertyPrefs | null;
+  service_address: string | null;
+  travel_km: number | null;
+  travel_cents: number | null;
+  created_at: string;
+}
+
 export function priceLabel(l: Pick<Listing, "price" | "status">): string {
+  if (l.status === "showcase" && !Number(l.price)) return "Showcase";
   const money = "$" + Number(l.price || 0).toLocaleString("en-CA");
   if (l.status === "lease") return money + " / month";
   if (l.status === "sold") return "Sold — " + money;
+  if (l.status === "showcase") return money;
   return money;
 }
 
@@ -41,6 +70,8 @@ export function chip(status: ListingStatus): { label: string; color: string } {
       return { label: "FOR LEASE", color: "#e8d9b0" };
     case "sold":
       return { label: "SOLD", color: "rgba(255,255,255,.75)" };
+    case "showcase":
+      return { label: "SHOWCASE", color: "#e8d9b0" };
   }
 }
 

@@ -151,13 +151,13 @@ export async function submitLead(
   try {
     await notifyLeadBySms(notification);
   } catch (e) {
-    console.error("Lead saved but SMS notification failed:", e);
+    console.error("Lead saved but SMS notification failed:", e instanceof Error ? e.message : e);
   }
 
   try {
     await notifyLeadByEmail(notification);
   } catch (e) {
-    console.error("Lead saved but email notification failed:", e);
+    console.error("Lead saved but email notification failed:", e instanceof Error ? e.message : e);
   }
 
   return { ok: true };

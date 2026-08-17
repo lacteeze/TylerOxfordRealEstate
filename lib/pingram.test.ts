@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { mediaBookingEmailHtml, realEstateEmailHtml } from "./pingram";
+import { DEFAULT_LEAD_EMAIL_TO, mediaBookingEmailHtml, realEstateEmailHtml } from "./pingram";
 import type { LeadNotification } from "@/app/actions";
+
+describe("lead email recipient", () => {
+  it("defaults to the published tyleroxford.com inbox, not a .ca address that bounced", () => {
+    expect(DEFAULT_LEAD_EMAIL_TO).toBe("tyler@tyleroxford.com");
+    expect(DEFAULT_LEAD_EMAIL_TO).not.toMatch(/@tyleroxford\.ca$/);
+  });
+});
 
 describe("lead email html", () => {
   it("includes media booking details and travel", () => {

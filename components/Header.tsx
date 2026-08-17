@@ -20,7 +20,10 @@ export default function Header() {
   const router = useRouter();
   const isAdmin = pathname.startsWith("/admin");
   const links: [string, string][] = isAdmin
-    ? [["/admin", "Manage"]]
+    ? [
+        ["/admin", "Manage"],
+        ["/admin/inquiries", "Inquiries"],
+      ]
     : navLinks;
 
   async function signOut() {
@@ -105,7 +108,15 @@ export default function Header() {
                   onClick={() => setOpen(false)}
                   className="no-underline transition-colors hover:!text-[var(--gold)]"
                   style={{
-                    color: label === "Manage" ? "rgba(var(--ink-rgb),.45)" : "var(--ink)",
+                    color:
+                      (href === "/admin" ? pathname === "/admin" : pathname.startsWith(href)) ||
+                      (!isAdmin && label === "Manage")
+                        ? isAdmin
+                          ? "var(--gold)"
+                          : label === "Manage"
+                            ? "rgba(var(--ink-rgb),.45)"
+                            : "var(--ink)"
+                        : "var(--ink)",
                     fontSize: 14.5,
                     fontWeight: 500,
                     padding: "10px 0",
@@ -118,8 +129,11 @@ export default function Header() {
             <div className="mt-3 flex flex-col gap-2.5 sm:flex-row md:mt-0">
               {isAdmin ? (
                 <>
-                  <Link href="/admin/settings" onClick={() => setOpen(false)} className="pill-navy justify-center">
-                    Settings <span className="pill-arrow">↗</span>
+                  <Link href="/admin/inquiries" onClick={() => setOpen(false)} className="pill-navy justify-center">
+                    Inquiries <span className="pill-arrow">↗</span>
+                  </Link>
+                  <Link href="/admin/settings" onClick={() => setOpen(false)} className="pill-outline justify-center">
+                    Settings
                   </Link>
                   <Link href="/" onClick={() => setOpen(false)} className="pill-outline justify-center">
                     View site <span className="pill-arrow">↗</span>

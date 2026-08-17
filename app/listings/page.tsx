@@ -19,10 +19,11 @@ export default async function ListingsPage({
     .from("listings")
     .select("*")
     .eq("archived", false)
+    .eq("published", true)
     .order("created_at", { ascending: false });
   const listings = (data || []) as Listing[];
 
-  const initialFilter = (["sale", "lease", "sold"] as ListingStatus[]).includes(
+  const initialFilter = (["sale", "lease", "sold", "showcase"] as ListingStatus[]).includes(
     params.status as ListingStatus
   )
     ? (params.status as ListingStatus)

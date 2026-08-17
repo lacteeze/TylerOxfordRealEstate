@@ -18,6 +18,7 @@ export default async function PropertyPage({
     .select("*")
     .eq("id", decodeURIComponent(id))
     .eq("archived", false)
+    .eq("published", true)
     .maybeSingle();
 
   if (!data) notFound();
@@ -29,9 +30,10 @@ export default async function PropertyPage({
     ? `https://www.openstreetmap.org/export/embed.html?bbox=${(cur.lng ?? 0) - d}%2C${cur.lat - d * 0.55}%2C${(cur.lng ?? 0) + d}%2C${cur.lat + d * 0.55}&layer=mapnik&marker=${cur.lat}%2C${cur.lng}`
     : "";
 
-  const ctaEyebrow = sold ? "CASE STUDY" : cur.status === "lease" ? "FOR LEASE" : "FOR SALE";
-  const ctaTitle = sold ? "Want your home to sell like this?" : "Book a private viewing";
-  const ctaBody = sold
+  const showcase = cur.status === "showcase";
+  const ctaEyebrow = sold ? "CASE STUDY" : showcase ? "MOVE MEDIA" : cur.status === "lease" ? "FOR LEASE" : "FOR SALE";
+  const ctaTitle = sold || showcase ? "Want your home to look like this?" : "Book a private viewing";
+  const ctaBody = sold || showcase
     ? "Every listing Tyler represents launches with the full Move Media treatment — photography, film, and drone, included."
     : "Tyler will walk you through the home in person, or send the full cinematic tour first. No pressure, no scripts.";
 

@@ -58,6 +58,7 @@ export default function HeroSearch() {
           <option value="sale">For sale</option>
           <option value="lease">For lease</option>
           <option value="sold">Sold</option>
+          <option value="showcase">Showcase</option>
         </select>
         <span aria-hidden className="pointer-events-none absolute right-3" style={{ fontSize: 10 }}>▾</span>
       </label>

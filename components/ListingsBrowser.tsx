@@ -31,7 +31,7 @@ export default function ListingsBrowser({
   const [sort, setSort] = useState("featured");
 
   const counts = useMemo(() => {
-    const c: Record<FilterKey, number> = { all: listings.length, sale: 0, lease: 0, sold: 0 };
+    const c: Record<FilterKey, number> = { all: listings.length, sale: 0, lease: 0, sold: 0, showcase: 0 };
     listings.forEach((l) => {
       c[l.status] += 1;
     });
@@ -114,6 +114,7 @@ export default function ListingsBrowser({
             ["sale", `For sale (${counts.sale})`],
             ["lease", `For lease (${counts.lease})`],
             ["sold", `Sold (${counts.sold})`],
+            ["showcase", `Showcase (${counts.showcase})`],
           ] as [FilterKey, string][]
         ).map(([key, label]) => {
           const on = key === filter;

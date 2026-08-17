@@ -4,9 +4,15 @@ import type { LeadNotification } from "@/app/actions";
 import { formatPropertyPrefs } from "@/lib/inquiry";
 import { SERVICE_BY_ID, TRAVEL_FREE_KM, formatCad } from "@/lib/pricing";
 
-const LEAD_EMAIL_TO = "tyler@tyleroxford.ca";
+// tyler@tyleroxford.ca bounced (Google 550 5.1.1 — mailbox does not exist).
+// Override with LEAD_EMAIL_TO if the inbox ever changes.
+export const DEFAULT_LEAD_EMAIL_TO = "tyler@tyleroxford.com";
 const LEAD_SENDER_EMAIL = "info@tyleroxford.com";
 const LEAD_SENDER_NAME = "Tyler Oxford";
+
+function leadEmailTo(): string {
+  return (process.env.LEAD_EMAIL_TO || DEFAULT_LEAD_EMAIL_TO).trim();
+}
 
 function pingramClient(): Pingram | null {
   const apiKey = process.env.PINGRAM_API_KEY;
@@ -18,6 +24,17 @@ function pingramClient(): Pingram | null {
     apiKey,
     baseUrl: process.env.PINGRAM_BASE_URL || "https://api.ca.pingram.io",
   });
+}
+
+function pingramFailureMessage(
+  channel: "email" | "sms",
+  result: { trackingId?: string; messages?: string[]; error?: { code?: string; message?: string; fix?: string } | null }
+): string | null {
+  const err = result.error;
+  if (err?.message) {
+    return `Pingram ${channel} failed (${err.code ?? "unknown"}): ${err.message}${err.fix ? ` — ${err.fix}` : ""}`;
+  }
+  return null;
 }
 
 function escapeHtml(value: string): string {
@@ -150,30 +167,46 @@ export async function notifyLeadBySms(lead: LeadNotification): Promise<void> {
     lead.message ? `"${lead.message.slice(0, 280)}"` : null,
   ].filter(Boolean);
 
-  await pingram.sms.send({
+  const result = await pingram.sms.send({
     type: "website_lead",
     to,
     message: lines.join("\n"),
   });
+  const failure = pingramFailureMessage("sms", result);
+  if (failure) throw new Error(failure);
+  console.info("Lead SMS sent", { to, trackingId: result.trackingId, type: "website_lead" });
 }
 
 export async function notifyLeadByEmail(lead: LeadNotification): Promise<void> {
   const pingram = pingramClient();
-  if (!pingram) return;
+  if (!pingram) {
+    console.warn("Lead email skipped: PINGRAM_API_KEY is not set.");
+    return;
+  }
+
+  const to = leadEmailTo();
+  if (!to) {
+    console.warn("Lead email skipped: LEAD_EMAIL_TO is empty.");
+    return;
+  }
 
   const isMedia = lead.kind === "media";
+  const type = isMedia ? "media_booking" : "website_lead";
   const subject = isMedia
     ? `Media booking — ${lead.name}${lead.quote ? ` — ${formatCad(lead.quote.total)}` : ""}`
     : `Real estate inquiry — ${lead.name}`;
+  const replyTo = (lead.email || "").trim();
 
-  await pingram.send({
-    type: isMedia ? "media_booking" : "website_lead",
-    to: { email: LEAD_EMAIL_TO },
-    email: {
-      subject,
-      html: isMedia ? mediaBookingEmailHtml(lead) : realEstateEmailHtml(lead),
-      senderName: LEAD_SENDER_NAME,
-      senderEmail: LEAD_SENDER_EMAIL,
-    },
+  const result = await pingram.email.send({
+    type,
+    to,
+    subject,
+    html: isMedia ? mediaBookingEmailHtml(lead) : realEstateEmailHtml(lead),
+    fromName: LEAD_SENDER_NAME,
+    fromAddress: LEAD_SENDER_EMAIL,
+    replyToAddresses: replyTo ? [replyTo] : undefined,
   });
+  const failure = pingramFailureMessage("email", result);
+  if (failure) throw new Error(failure);
+  console.info("Lead email sent", { to, type, trackingId: result.trackingId });
 }

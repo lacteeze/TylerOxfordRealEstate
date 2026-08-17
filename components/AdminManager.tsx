@@ -22,6 +22,7 @@ interface FormState {
   description: string;
   video_url: string;
   featured: boolean;
+  published: boolean;
   lat: string;
   lng: string;
   photos: string[];
@@ -47,6 +48,7 @@ function blankForm(): FormState {
     description: "",
     video_url: "",
     featured: false,
+    published: false,
     lat: "47.5615",
     lng: "-52.7126",
     photos: [],
@@ -115,7 +117,7 @@ function ListingRow({
           {listing.title}
         </span>
         <span style={{ fontSize: 11.5, color: "rgba(var(--ink-rgb),.5)", letterSpacing: ".04em" }}>
-          {c.label} · {priceLabel(listing)} · {(listing.photos || []).length} photos
+          {listing.published ? "Public" : "Private"} · {c.label} · {priceLabel(listing)} · {(listing.photos || []).length} photos
         </span>
       </div>
       <button
@@ -181,6 +183,7 @@ export default function AdminManager({
       description: l.description,
       video_url: l.video_url,
       featured: l.featured,
+      published: Boolean(l.published),
       lat: String(l.lat ?? "47.5615"),
       lng: String(l.lng ?? "-52.7126"),
       photos: l.photos || [],
@@ -315,7 +318,7 @@ export default function AdminManager({
       setError("Give the listing an address or title.");
       return;
     }
-    if (!Number(form.price)) {
+    if (form.status !== "showcase" && !Number(form.price)) {
       setError("Enter a price.");
       return;
     }
@@ -342,7 +345,8 @@ export default function AdminManager({
       blurb: form.blurb.trim(),
       description: form.description.trim(),
       video_url: form.video_url.trim(),
-      featured: form.featured,
+      featured: form.published ? form.featured : false,
+      published: form.published,
       lat: Number(form.lat) || 47.5615,
       lng: Number(form.lng) || -52.7126,
       photos: form.photos,
@@ -429,8 +433,10 @@ export default function AdminManager({
         )}
       </div>
       <p style={{ margin: "8px 0 40px", fontSize: 13.5, color: "rgba(var(--ink-rgb),.55)", maxWidth: 560 }}>
-        Add, edit or archive properties, and swap the photos used on each home-page section.
-        Archived listings leave the public site and can be restored here.
+        Add, edit or archive properties, and swap the photos used on each home-page section. New listings start private. Archived listings leave the public site and can be restored here.{" "}
+        <Link href="/admin/inquiries" className="no-underline" style={{ color: "var(--gold)", fontWeight: 600 }}>
+          View inquiries →
+        </Link>
       </p>
 
       {editing === null && (
@@ -516,12 +522,48 @@ export default function AdminManager({
                 <option value="sale">For sale</option>
                 <option value="lease">For lease</option>
                 <option value="sold">Sold</option>
+                <option value="showcase">Showcase / portfolio</option>
               </select>
             </label>
             <label className="flex flex-col gap-1.5">
-              <span style={labelStyle}>{form.status === "lease" ? "MONTHLY RENT (CAD) *" : "PRICE (CAD) *"}</span>
-              <input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="875000" style={fieldStyle} />
+              <span style={labelStyle}>
+                {form.status === "lease" ? "MONTHLY RENT (CAD) *" : form.status === "showcase" ? "PRICE (CAD, OPTIONAL)" : "PRICE (CAD) *"}
+              </span>
+              <input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder={form.status === "showcase" ? "Leave blank for no price" : "875000"} style={fieldStyle} />
             </label>
+            <div className="flex flex-col gap-1.5">
+              <span style={labelStyle}>VISIBILITY</span>
+              <div className="flex flex-wrap gap-2">
+                {(
+                  [
+                    [true, "Public"],
+                    [false, "Private"],
+                  ] as const
+                ).map(([value, label]) => {
+                  const on = form.published === value;
+                  return (
+                    <button
+                      key={label}
+                      type="button"
+                      onClick={() => setForm({ ...form, published: value, featured: value ? form.featured : false })}
+                      className="cursor-pointer rounded-full border-none transition-colors"
+                      style={{
+                        fontSize: 12.5,
+                        fontWeight: 500,
+                        padding: "10px 18px",
+                        background: on ? "var(--navy)" : "var(--card)",
+                        color: on ? "#fff" : "var(--ink)",
+                      }}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+              <span style={{ fontSize: 11.5, color: "rgba(var(--ink-rgb),.5)" }}>
+                Private listings stay off the public site. New listings start private.
+              </span>
+            </div>
             <div className="grid grid-cols-3 gap-5">
               <label className="flex flex-col gap-1.5">
                 <span style={labelStyle}>BEDS</span>
@@ -536,14 +578,17 @@ export default function AdminManager({
                 <input type="number" value={form.sqft} onChange={(e) => setForm({ ...form, sqft: e.target.value })} style={fieldStyle} />
               </label>
             </div>
-            <label className="flex cursor-pointer items-center gap-2.5 self-end pb-3">
+            <label className="flex cursor-pointer items-center gap-2.5 self-end pb-3" style={{ opacity: form.published ? 1 : 0.5 }}>
               <input
                 type="checkbox"
-                checked={form.featured}
+                checked={form.published && form.featured}
+                disabled={!form.published}
                 onChange={(e) => setForm({ ...form, featured: e.target.checked })}
                 style={{ accentColor: "var(--gold)", width: 16, height: 16 }}
               />
-              <span style={{ fontSize: 12.5, color: "rgba(var(--ink-rgb),.75)" }}>Feature on the home page</span>
+              <span style={{ fontSize: 12.5, color: "rgba(var(--ink-rgb),.75)" }}>
+                Feature on the home page{form.published ? "" : " (public listings only)"}
+              </span>
             </label>
             <label className="flex flex-col gap-1.5" style={{ gridColumn: "1/-1" }}>
               <span style={labelStyle}>ONE-LINE TEASER (SHOWN ON CARDS)</span>
