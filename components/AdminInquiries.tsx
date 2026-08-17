@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { formatPropertyPrefs } from "@/lib/inquiry";
+import { inquiryNeighbors } from "@/lib/inquiry-nav";
 import { SERVICE_BY_ID, TRAVEL_FREE_KM, formatCad, isServiceId } from "@/lib/pricing";
 import type { Lead } from "@/lib/types";
 
@@ -55,10 +56,22 @@ export default function AdminInquiries({ initialLeads }: { initialLeads: Lead[] 
     () => (filter === "all" ? initialLeads : initialLeads.filter((l) => l.kind === filter)),
     [filter, initialLeads]
   );
-  const selected = filtered.find((l) => l.id === selectedId) || null;
+  const nav = inquiryNeighbors(filtered, selectedId);
+  const selected = nav.current;
+  const prevId = nav.prev?.id;
+  const nextId = nav.next?.id;
 
   if (selected) {
-    return <InquiryDetail lead={selected} onBack={() => setSelectedId(null)} />;
+    return (
+      <InquiryDetail
+        lead={selected}
+        index={nav.index}
+        total={filtered.length}
+        onBack={() => setSelectedId(null)}
+        onPrev={prevId ? () => setSelectedId(prevId) : undefined}
+        onNext={nextId ? () => setSelectedId(nextId) : undefined}
+      />
+    );
   }
 
   return (
@@ -157,7 +170,34 @@ export default function AdminInquiries({ initialLeads }: { initialLeads: Lead[] 
   );
 }
 
-function InquiryDetail({ lead, onBack }: { lead: Lead; onBack: () => void }) {
+function InquiryDetail({
+  lead,
+  index,
+  total,
+  onBack,
+  onPrev,
+  onNext,
+}: {
+  lead: Lead;
+  index: number;
+  total: number;
+  onBack: () => void;
+  onPrev?: () => void;
+  onNext?: () => void;
+}) {
+  useEffect(() => {
+    function onKey(event: KeyboardEvent) {
+      const target = event.target as HTMLElement | null;
+      if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) {
+        return;
+      }
+      if (event.key === "ArrowLeft") onPrev?.();
+      if (event.key === "ArrowRight") onNext?.();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onPrev, onNext]);
+
   const prefs = formatPropertyPrefs(
     lead.property_prefs ? { ...lead.property_prefs, address: undefined } : null
   );
@@ -174,7 +214,7 @@ function InquiryDetail({ lead, onBack }: { lead: Lead; onBack: () => void }) {
       className="max-w-[1100px]"
       style={{ padding: "clamp(44px,6vw,72px) clamp(20px,4vw,48px) clamp(64px,8vw,110px)", minHeight: "80vh" }}
     >
-      <div className="flex flex-wrap items-center justify-between gap-3" style={{ marginBottom: 28 }}>
+      <div className="flex flex-wrap items-center justify-between gap-3" style={{ marginBottom: 18 }}>
         <h1 className="font-serif-display m-0" style={{ fontSize: "clamp(32px,4vw,48px)", lineHeight: 1.05, fontWeight: 500 }}>
           {lead.name}
         </h1>
@@ -185,6 +225,31 @@ function InquiryDetail({ lead, onBack }: { lead: Lead; onBack: () => void }) {
           style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".12em", padding: "9px 16px", color: "var(--ink)", borderColor: "rgba(var(--ink-rgb),.25)" }}
         >
           ← INQUIRIES
+        </button>
+      </div>
+      <div className="mb-7 flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={onPrev}
+          disabled={!onPrev}
+          aria-label="Previous inquiry"
+          className="cursor-pointer border bg-transparent transition-colors hover:enabled:!border-[var(--gold)] hover:enabled:!text-[var(--gold)] disabled:cursor-default disabled:opacity-35"
+          style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".12em", padding: "9px 16px", color: "var(--ink)", borderColor: "rgba(var(--ink-rgb),.25)" }}
+        >
+          ← PREVIOUS
+        </button>
+        <span style={{ fontSize: 12, color: "rgba(var(--ink-rgb),.5)", padding: "0 6px" }}>
+          {index + 1} of {total}
+        </span>
+        <button
+          type="button"
+          onClick={onNext}
+          disabled={!onNext}
+          aria-label="Next inquiry"
+          className="cursor-pointer border bg-transparent transition-colors hover:enabled:!border-[var(--gold)] hover:enabled:!text-[var(--gold)] disabled:cursor-default disabled:opacity-35"
+          style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".12em", padding: "9px 16px", color: "var(--ink)", borderColor: "rgba(var(--ink-rgb),.25)" }}
+        >
+          NEXT →
         </button>
       </div>
 

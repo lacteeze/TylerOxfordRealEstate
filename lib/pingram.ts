@@ -177,6 +177,44 @@ export async function notifyLeadBySms(lead: LeadNotification): Promise<void> {
   console.info("Lead SMS sent", { to, trackingId: result.trackingId, type: "website_lead" });
 }
 
+export function adminMagicLinkEmailHtml(signInUrl: string): string {
+  return `<div style="font-family:Georgia,serif;font-size:15px;line-height:1.5;color:#1a2744">
+    <p style="margin:0 0 16px">Sign in to Tyler Oxford admin</p>
+    <p style="margin:0 0 16px">Use this one-time link to sign in without a password. It expires after a short time.</p>
+    <p style="margin:0"><a href="${escapeHtml(signInUrl)}" style="color:#1a2744">Sign in to admin</a></p>
+  </div>`;
+}
+
+export function adminRecoveryEmailHtml(resetUrl: string): string {
+  return `<div style="font-family:Georgia,serif;font-size:15px;line-height:1.5;color:#1a2744">
+    <p style="margin:0 0 16px">Reset your Tyler Oxford admin password</p>
+    <p style="margin:0 0 16px">Use this one-time link to choose a new password. It expires after a short time.</p>
+    <p style="margin:0"><a href="${escapeHtml(resetUrl)}" style="color:#1a2744">Set a new password</a></p>
+  </div>`;
+}
+
+export async function sendTransactionalEmail(opts: {
+  type: string;
+  to: string;
+  subject: string;
+  html: string;
+}): Promise<void> {
+  const pingram = pingramClient();
+  if (!pingram) {
+    throw new Error("Pingram not configured (PINGRAM_API_KEY missing).");
+  }
+  const result = await pingram.email.send({
+    type: opts.type,
+    to: opts.to,
+    subject: opts.subject,
+    html: opts.html,
+    fromName: LEAD_SENDER_NAME,
+    fromAddress: LEAD_SENDER_EMAIL,
+  });
+  const failure = pingramFailureMessage("email", result);
+  if (failure) throw new Error(failure);
+}
+
 export async function notifyLeadByEmail(lead: LeadNotification): Promise<void> {
   const pingram = pingramClient();
   if (!pingram) {

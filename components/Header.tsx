@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { REMEMBER_COOKIE } from "@/lib/admin-session";
 import { createClient } from "@/lib/supabase/client";
 
 const navLinks: [string, string][] = [
@@ -29,6 +30,7 @@ export default function Header() {
   async function signOut() {
     const supabase = createClient();
     await supabase.auth.signOut();
+    document.cookie = `${REMEMBER_COOKIE}=; Path=/; Max-Age=0`;
     setOpen(false);
     router.push("/");
     router.refresh();

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_LEAD_EMAIL_TO, mediaBookingEmailHtml, realEstateEmailHtml } from "./pingram";
+import { DEFAULT_LEAD_EMAIL_TO, adminMagicLinkEmailHtml, adminRecoveryEmailHtml, mediaBookingEmailHtml, realEstateEmailHtml } from "./pingram";
 import type { LeadNotification } from "@/app/actions";
 
 describe("lead email recipient", () => {
@@ -53,5 +53,16 @@ describe("lead email html", () => {
     expect(html).toContain("Sam Seller");
     expect(html).toContain("88 Water St");
     expect(html).toContain("Selling");
+  });
+});
+
+describe("admin auth emails", () => {
+  it("includes the sign-in and reset links", () => {
+    expect(adminMagicLinkEmailHtml("https://example.com/admin/auth/callback?token_hash=abc")).toContain(
+      "https://example.com/admin/auth/callback?token_hash=abc"
+    );
+    expect(adminRecoveryEmailHtml("https://example.com/admin/update-password")).toContain(
+      "Set a new password"
+    );
   });
 });

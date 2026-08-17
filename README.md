@@ -20,6 +20,32 @@ Oxford Media, an award-winning real estate media studio in St. John's, Newfoundl
   listings, swap the photos used on each home-page section, and upload photos to Supabase
   Storage. `/admin/settings` connects Google Drive for folder imports.
 
+## Admin auth
+
+Admin login lives at `/admin/login`. **Remember me** is checked by default and keeps the session cookie for 30 days. Unchecked, the session lasts for the browser session (until the window is closed).
+
+Forgot password can email a **magic sign-in link** or a **password reset** link. After a reset link, `/admin/update-password` sets a new password and continues to `/admin`.
+
+Emails are sent through Pingram to the typed address when it matches an existing Auth user **if** `SUPABASE_SERVICE_ROLE_KEY` is set (so the app can generate the link). Otherwise Supabase Auth sends the email itself.
+
+### Supabase dashboard URL config
+
+In [URL Configuration](https://supabase.com/dashboard/project/moqhrfdqwpvucxoemcrg/auth/url-configuration):
+
+- **Site URL:** `https://tyler-oxford-real-estate.vercel.app`
+- **Redirect URLs** (add each):
+  - `https://tyler-oxford-real-estate.vercel.app/admin/login`
+  - `https://tyler-oxford-real-estate.vercel.app/admin/auth/callback`
+  - `https://tyler-oxford-real-estate.vercel.app/admin/update-password`
+  - `https://tyler-oxford-real-estate.vercel.app/**`
+  - `http://localhost:3001/admin/login`
+  - `http://localhost:3001/admin/auth/callback`
+  - `http://localhost:3001/admin/update-password`
+  - `http://localhost:3001/**`
+  - `http://localhost:3000/**` (if you run `next dev` on the default port)
+
+Optional: Authentication → Sessions — keep the session time-box at least 30 days (or disabled) so Remember me can last a month.
+
 ## Local development
 
 ```bash
@@ -35,6 +61,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
 # GOOGLE_REDIRECT_URI is optional; derived from the request origin when unset.
+# Optional: send magic/reset links through Pingram instead of Supabase SMTP.
+# SUPABASE_SERVICE_ROLE_KEY=
 ```
 
 ### Google Drive (admin photo import)

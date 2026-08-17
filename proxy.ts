@@ -1,5 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import {
+  isRememberPref,
+  REMEMBER_COOKIE,
+  withAuthCookieLifetime,
+} from "@/lib/admin-session";
 
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -10,6 +15,8 @@ export async function proxy(request: NextRequest) {
     return supabaseResponse;
   }
 
+  const remember = isRememberPref(request.cookies.get(REMEMBER_COOKIE)?.value);
+
   const supabase = createServerClient(url, anonKey, {
     cookies: {
       getAll() {
@@ -19,7 +26,11 @@ export async function proxy(request: NextRequest) {
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
         supabaseResponse = NextResponse.next({ request });
         cookiesToSet.forEach(({ name, value, options }) =>
-          supabaseResponse.cookies.set(name, value, options)
+          supabaseResponse.cookies.set(
+            name,
+            value,
+            withAuthCookieLifetime(options as Record<string, unknown>, remember)
+          )
         );
       },
     },
@@ -29,18 +40,22 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isAdminRoute = request.nextUrl.pathname.startsWith("/admin");
-  const isLogin = request.nextUrl.pathname.startsWith("/admin/login");
+  const pathname = request.nextUrl.pathname;
+  const isAdminRoute = pathname.startsWith("/admin");
+  const isPublicAdminAuth =
+    pathname.startsWith("/admin/login") || pathname.startsWith("/admin/auth/callback");
 
-  if (isAdminRoute && !isLogin && !user) {
+  if (isAdminRoute && !isPublicAdminAuth && !user) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/admin/login";
+    redirectUrl.search = "";
     return NextResponse.redirect(redirectUrl);
   }
 
-  if (isLogin && user) {
+  if (pathname.startsWith("/admin/login") && user) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/admin";
+    redirectUrl.search = "";
     return NextResponse.redirect(redirectUrl);
   }
 
